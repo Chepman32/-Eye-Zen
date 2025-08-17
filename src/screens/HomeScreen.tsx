@@ -56,7 +56,7 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
     <View style={styles.container}>
       <Animated.View style={[styles.buttonWrap, buttonStyle]}>
         <Pressable onPress={onStart} style={styles.circle} android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}>
-          <LinearGradient colors={["#4CAF50", "#81C784"]} style={styles.circle}>
+          <LinearGradient colors={["rgba(76, 175, 80, 0.8)", "rgba(129, 199, 132, 0.8)"]} style={styles.circle}>
             <Text style={styles.startText}>Start</Text>
           </LinearGradient>
         </Pressable>

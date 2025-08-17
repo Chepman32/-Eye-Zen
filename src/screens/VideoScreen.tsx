@@ -19,6 +19,7 @@ const source = require('../../assets/video/video.mp4');
 const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>> = ({ navigation }) => {
   const player = useRef<React.ElementRef<typeof Video>>(null);
   const [paused, setPaused] = useState(false);
+  const [muted, setMuted] = useState(true);
 
   const videoOpacity = useSharedValue(0);
   const controlsOffset = useSharedValue(40);
@@ -72,6 +73,7 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
           resizeMode="contain"
           onLoad={onLoad}
           paused={paused}
+          muted={muted}
           playInBackground={false}
           ignoreSilentSwitch="obey"
           repeat
@@ -97,6 +99,17 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
           </Animated.View>
         </Pressable>
       </Animated.View>
+
+      {/* Mute/Unmute button */}
+      <Animated.View style={[styles.muteWrap, playStyle]}>
+        <Pressable
+          onPress={() => setMuted(m => !m)}
+          style={styles.roundBtn}
+          android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}
+        >
+          <Icon name={muted ? 'ios-volume-mute' : 'ios-volume-high'} size={20} color="#FFFFFF" />
+        </Pressable>
+      </Animated.View>
     </View>
   );
 };
@@ -107,6 +120,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
   closeWrap: { position: 'absolute', top: 20 + (Platform.OS === 'ios' ? 20 : 0), right: 16 },
   playWrap: { position: 'absolute', bottom: 28, left: 16 },
+  muteWrap: { position: 'absolute', bottom: 28, right: 16 },
   roundBtn: {
     width: 44,
     height: 44,

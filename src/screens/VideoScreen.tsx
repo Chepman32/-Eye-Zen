@@ -49,7 +49,13 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
     videoOpacity.value = withTiming(0, { duration: 250 });
     controlsOffset.value = withTiming(40, { duration: 200 });
     closeOffset.value = withTiming(-40, { duration: 200 });
-    setTimeout(() => navigation.goBack(), 220);
+    // proactively return to portrait
+    Orientation.lockToPortrait();
+    setTimeout(() => {
+      navigation.goBack();
+      // ensure rotation after navigation completes
+      setTimeout(() => Orientation.lockToPortrait(), 120);
+    }, 220);
   };
 
   const videoStyle = useAnimatedStyle(() => ({ opacity: videoOpacity.value }));
@@ -63,7 +69,7 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
           ref={player}
           source={source}
           style={StyleSheet.absoluteFill}
-          resizeMode="cover"
+          resizeMode="contain"
           onLoad={onLoad}
           paused={paused}
           playInBackground={false}
@@ -75,7 +81,7 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
       {/* Close button */}
       <Animated.View style={[styles.closeWrap, closeStyle]}>
         <Pressable onPress={onClose} style={styles.roundBtn} android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}>
-          <Icon name="close" size={22} color="#FFFFFF" />
+          <Icon name="ios-close" size={22} color="#FFFFFF" />
         </Pressable>
       </Animated.View>
 
@@ -87,7 +93,7 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
           android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}
         >
           <Animated.View style={{ transform: [{ rotate: paused ? '0deg' : '180deg' }] }}>
-            <Icon name={paused ? 'play' : 'pause'} size={22} color="#FFFFFF" />
+            <Icon name={paused ? 'ios-play' : 'ios-pause'} size={22} color="#FFFFFF" />
           </Animated.View>
         </Pressable>
       </Animated.View>

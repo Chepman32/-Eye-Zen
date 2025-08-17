@@ -13,12 +13,22 @@ import Animated, {
 } from 'react-native-reanimated';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
+import { useFocusEffect } from '@react-navigation/native';
+import Orientation from 'react-native-orientation-locker';
 
 const { width, height } = Dimensions.get('window');
 const BUTTON_SIZE = Math.min(width, height) * 0.4;
 
 const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
   const idleScale = useSharedValue(1);
+
+  // Ensure portrait when returning from Video
+  useFocusEffect(
+    React.useCallback(() => {
+      Orientation.lockToPortrait();
+      return undefined;
+    }, [])
+  );
 
   useEffect(() => {
     idleScale.value = withRepeat(

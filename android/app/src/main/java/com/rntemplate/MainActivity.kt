@@ -1,4 +1,4 @@
-package com.rntemplate
+package com.eyeszen.antonchepur.app
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

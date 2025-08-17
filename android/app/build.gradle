@@ -77,7 +77,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.rntemplate"
+    namespace "com.eyeszen.antonchepur.app"
     defaultConfig {
         applicationId "com.eyeszen.antonchepur.app"
         minSdkVersion rootProject.ext.minSdkVersion

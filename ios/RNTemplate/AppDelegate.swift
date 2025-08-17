@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
 
     factory.startReactNative(
-      withModuleName: "RNTemplate",
+      withModuleName: "EyeZen",
       in: window,
       launchOptions: launchOptions
     )

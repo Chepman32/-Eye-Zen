@@ -79,7 +79,7 @@ android {
 
     namespace "com.rntemplate"
     defaultConfig {
-        applicationId "com.rntemplate"
+        applicationId "com.eyeszen.antonchepur.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -83,7 +83,7 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
       {/* Close button */}
       <Animated.View style={[styles.closeWrap, closeStyle]}>
         <Pressable onPress={onClose} style={styles.roundBtn} android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}>
-          <Icon name="ios-close" size={22} color="#FFFFFF" />
+          <Icon name="close" size={22} color="#FFFFFF" />
         </Pressable>
       </Animated.View>
 
@@ -95,7 +95,7 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
           android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}
         >
           <Animated.View style={{ transform: [{ rotate: paused ? '0deg' : '180deg' }] }}>
-            <Icon name={paused ? 'ios-play' : 'ios-pause'} size={22} color="#FFFFFF" />
+            <Icon name={paused ? 'play' : 'pause'} size={22} color="#FFFFFF" />
           </Animated.View>
         </Pressable>
       </Animated.View>
@@ -107,7 +107,7 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
           style={styles.roundBtn}
           android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}
         >
-          <Icon name={muted ? 'ios-volume-mute' : 'ios-volume-high'} size={20} color="#FFFFFF" />
+          <Icon name={muted ? 'volume-mute' : 'volume-high'} size={20} color="#FFFFFF" />
         </Pressable>
       </Animated.View>
     </View>

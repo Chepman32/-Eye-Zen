@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Animated, {
@@ -10,6 +10,7 @@ import Animated, {
   Easing,
   runOnJS,
 } from 'react-native-reanimated';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 
@@ -18,6 +19,22 @@ const SplashScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Splash'
   const textOpacity = useSharedValue(0);
   const containerOpacity = useSharedValue(1);
   const containerTranslateY = useSharedValue(0);
+  const [nextScreen, setNextScreen] = useState<'Onboarding' | 'Home'>('Home');
+
+  useEffect(() => {
+    // Check if onboarding was completed
+    const checkOnboarding = async () => {
+      try {
+        const completed = await AsyncStorage.getItem('@eyezen_onboarding_completed');
+        setNextScreen(completed ? 'Home' : 'Onboarding');
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+        setNextScreen('Onboarding'); // Default to showing onboarding if error
+      }
+    };
+
+    checkOnboarding();
+  }, []);
 
   useEffect(() => {
     logoScale.value = withSpring(1, { damping: 12, stiffness: 120 });
@@ -26,12 +43,12 @@ const SplashScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Splash'
     const timeout = setTimeout(() => {
       containerOpacity.value = withTiming(0, { duration: 350, easing: Easing.out(Easing.quad) });
       containerTranslateY.value = withTiming(-20, { duration: 350 }, (finished: boolean) => {
-        if (finished) runOnJS(navigation.replace)('Home');
+        if (finished) runOnJS(navigation.replace)(nextScreen);
       });
     }, 2000);
 
     return () => clearTimeout(timeout);
-  }, [containerOpacity, containerTranslateY, logoScale, navigation, textOpacity]);
+  }, [containerOpacity, containerTranslateY, logoScale, navigation, textOpacity, nextScreen]);
 
   const logoStyle = useAnimatedStyle(() => ({ transform: [{ scale: logoScale.value }] }));
   const textStyle = useAnimatedStyle(() => ({ opacity: textOpacity.value }));

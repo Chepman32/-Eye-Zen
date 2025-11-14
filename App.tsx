@@ -11,6 +11,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from './src/screens/SplashScreen';
+import OnboardingScreen from './src/screens/OnboardingScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import VideoScreen from './src/screens/VideoScreen';
 import { enableScreens } from 'react-native-screens';
@@ -21,6 +22,7 @@ enableScreens(true);
 
 export type RootStackParamList = {
   Splash: undefined;
+  Onboarding: undefined;
   Home: undefined;
   Video: undefined;
 };
@@ -50,6 +52,7 @@ function App() {
             screenOptions={{ headerShown: false, animation: 'fade', orientation: 'portrait' }}
           >
             <Stack.Screen name="Splash" component={SplashScreen} options={{ orientation: 'portrait' }} />
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ orientation: 'portrait' }} />
             <Stack.Screen name="Home" component={HomeScreen} options={{ orientation: 'portrait' }} />
             <Stack.Screen
               name="Video"

@@ -15,6 +15,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import VideoScreen from './src/screens/VideoScreen';
 import { enableScreens } from 'react-native-screens';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { PurchaseProvider } from './src/contexts/PurchaseContext';
 
 enableScreens(true);
 
@@ -35,33 +36,35 @@ function App() {
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NavigationContainer
-        theme={{
-          ...DefaultTheme,
-          colors: { ...DefaultTheme.colors, background: '#FFFFFF' },
-        }}
-      >
-        <Stack.Navigator
-          initialRouteName="Splash"
-          screenOptions={{ headerShown: false, animation: 'fade', orientation: 'portrait' }}
+    <PurchaseProvider>
+      <SafeAreaProvider>
+        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        <NavigationContainer
+          theme={{
+            ...DefaultTheme,
+            colors: { ...DefaultTheme.colors, background: '#FFFFFF' },
+          }}
         >
-          <Stack.Screen name="Splash" component={SplashScreen} options={{ orientation: 'portrait' }} />
-          <Stack.Screen name="Home" component={HomeScreen} options={{ orientation: 'portrait' }} />
-          <Stack.Screen
-            name="Video"
-            component={VideoScreen}
-            options={{
-              animation: 'slide_from_right',
-              // Force landscape for this screen (native-stack option)
-              // Values: 'portrait' | 'landscape' | 'all' | 'allButUpsideDown'
-              orientation: 'landscape',
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+          <Stack.Navigator
+            initialRouteName="Splash"
+            screenOptions={{ headerShown: false, animation: 'fade', orientation: 'portrait' }}
+          >
+            <Stack.Screen name="Splash" component={SplashScreen} options={{ orientation: 'portrait' }} />
+            <Stack.Screen name="Home" component={HomeScreen} options={{ orientation: 'portrait' }} />
+            <Stack.Screen
+              name="Video"
+              component={VideoScreen}
+              options={{
+                animation: 'slide_from_right',
+                // Force landscape for this screen (native-stack option)
+                // Values: 'portrait' | 'landscape' | 'all' | 'allButUpsideDown'
+                orientation: 'landscape',
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </PurchaseProvider>
   );
 }
 

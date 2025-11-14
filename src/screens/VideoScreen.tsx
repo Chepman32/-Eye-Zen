@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Pressable, Platform, Text } from 'react-native';
+import { View, StyleSheet, Pressable, Platform } from 'react-native';
 import Video, { OnLoadData } from 'react-native-video';
 import Animated, {
   useSharedValue,
@@ -29,9 +29,6 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
 
   const {
     canWatchVideo,
-    remainingVideos,
-    maxDailyLimit,
-    isPremium,
     incrementWatchCount,
     isLoading,
   } = usePurchase();
@@ -110,10 +107,6 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
     setPaused((p) => !p);
   }, [paused, canWatchVideo]);
 
-  const handleNeedMore = () => {
-    setShowPurchaseModal(true);
-  };
-
   const videoStyle = useAnimatedStyle(() => ({
     opacity: videoOpacity.value,
   }));
@@ -141,19 +134,6 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
           repeat
         />
       </Animated.View>
-
-      {/* Status Badge */}
-      <View style={styles.badgeWrap}>
-        <Text style={styles.badgeText}>
-          {remainingVideos} / {maxDailyLimit} plays left today{' '}
-          {isPremium ? '(Premium)' : '(Free)'}
-        </Text>
-        {!isPremium && (
-          <Pressable onPress={handleNeedMore} hitSlop={8}>
-            <Text style={styles.badgeLink}>Need more?</Text>
-          </Pressable>
-        )}
-      </View>
 
       {/* Close Button */}
       <Animated.View style={[styles.closeWrap, closeStyle]}>
@@ -228,26 +208,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 28,
     right: 16,
-  },
-  badgeWrap: {
-    position: 'absolute',
-    top: 20 + (Platform.OS === 'ios' ? 20 : 0),
-    left: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-  },
-  badgeText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 13,
-  },
-  badgeLink: {
-    color: '#A5D6A7',
-    fontSize: 12,
-    marginTop: 4,
-    fontWeight: '600',
   },
   roundBtn: {
     width: 64,

@@ -99,7 +99,7 @@ const OnboardingScreen: React.FC<
 
     return (
       <View style={styles.slide}>
-        <Image source={item.image} style={styles.image} resizeMode="cover" />
+        <Image source={item.image} style={styles.image} resizeMode="contain" />
 
         {isLastSlide && (
           <>
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   paywallOverlay: {
     position: 'absolute',
-    bottom: 60,
+    bottom: 5,
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -204,8 +204,8 @@ const styles = StyleSheet.create({
   priceBadge: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: 32,
+    paddingVertical: 20,
     marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -214,31 +214,30 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   priceText: {
-    fontSize: 32,
+    fontSize: 42,
     fontWeight: '700',
     color: '#2C3E50',
     textAlign: 'center',
   },
   priceSubtext: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#7F8C8D',
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: 6,
   },
   closeButton: {
     position: 'absolute',
-    top: 60,
+    top: 20,
     right: 24,
-    width: 36,
-    height: 36,
+    width: 24,
+    height: 24,
     borderRadius: 18,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
   },
   closeButtonText: {
-    color: '#FFFFFF',
+    color: '#090909ff',
     fontSize: 24,
     fontWeight: '300',
   },
@@ -262,7 +261,7 @@ const styles = StyleSheet.create({
   },
   bottomControls: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 32,
     left: 0,
     right: 0,
     paddingHorizontal: 24,

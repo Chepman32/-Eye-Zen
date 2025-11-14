@@ -15,7 +15,6 @@ import {
   fetchProducts,
   purchasePremium,
   restorePurchases,
-  checkPremiumStatus,
   IAPProduct,
 } from '../services/iapService';
 import {
@@ -23,9 +22,7 @@ import {
   setIsPremium,
   setDailyWatchCount,
   setLastWatchDate,
-  getDailyWatchCount,
   getLastWatchDate,
-  getIsPremium,
   resetDailyWatchCount,
 } from '../services/storageService';
 
@@ -121,23 +118,9 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
       // Check for new day and reset if needed
       await checkAndResetDailyCount();
 
-      // Check premium status from IAP
-      if (Platform.OS === 'ios') {
-        try {
-          const hasPremium = await checkPremiumStatus();
-          if (hasPremium && !storageData.isPremium) {
-            setIsPremiumState(true);
-            await setIsPremium(true);
-          }
-        } catch (error: any) {
-          // Silently handle IAP unavailability - app will work with local storage state
-          if (error?.message?.includes('E_IAP_NOT_AVAILABLE')) {
-            console.warn('IAP not available - using local storage state');
-          } else {
-            console.error('Error checking premium status:', error);
-          }
-        }
-      }
+      // NOTE: We don't automatically check IAP status on launch to avoid Apple ID prompts.
+      // Premium status is restored from AsyncStorage.
+      // Users can explicitly restore purchases via the "Restore Purchases" button if needed.
 
       console.log('Initial data loaded:', {
         isPremium: storageData.isPremium,

@@ -109,6 +109,13 @@ const OnboardingScreen: React.FC<
             </Pressable>
 
             <View style={styles.paywallOverlay}>
+              {/* Benefit Text */}
+              <View style={styles.benefitContainer}>
+                <Text style={styles.benefitText}>
+                  Instead of one daily session, do up to five a day
+                </Text>
+              </View>
+
               {/* Price Badge */}
               <View style={styles.priceBadge}>
                 <Text style={styles.priceText}>{price}</Text>
@@ -200,6 +207,22 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
     paddingHorizontal: 24,
+    paddingTop: 0
+  },
+  benefitContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    marginBottom: 16,
+    width: '100%',
+  },
+  benefitText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#2C3E50',
+    textAlign: 'center',
+    lineHeight: 20,
   },
   priceBadge: {
     backgroundColor: '#FFFFFF',

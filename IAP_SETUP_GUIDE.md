@@ -321,6 +321,8 @@ Your implementation consists of:
 8. **`src/screens/HomeScreen.tsx`** - Shows premium status
 9. **`src/screens/VideoScreen.tsx`** - Enforces video limits
 
+> **Heads up:** If you ever hit the `[@RNC/AsyncStorage]: NativeModule: AsyncStorage is null` runtime error, the app now falls back to an in-memory storage shim so it can keep running. In that mode the watch counters reset whenever the app reloads, so make sure to run a clean native build (`cd ios && pod install`, rebuild Android, etc.) to restore the real `@react-native-async-storage/async-storage` module and regain persistence.
+
 ---
 
 ## Support Resources

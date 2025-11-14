@@ -7,7 +7,7 @@ import React, {
   ReactNode,
 } from 'react';
 import { Alert, Platform } from 'react-native';
-import { PurchaseError } from 'react-native-iap';
+import type { PurchaseError } from 'react-native-iap';
 import {
   initIAP,
   disconnectIAP,
@@ -123,10 +123,19 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
 
       // Check premium status from IAP
       if (Platform.OS === 'ios') {
-        const hasPremium = await checkPremiumStatus();
-        if (hasPremium && !storageData.isPremium) {
-          setIsPremiumState(true);
-          await setIsPremium(true);
+        try {
+          const hasPremium = await checkPremiumStatus();
+          if (hasPremium && !storageData.isPremium) {
+            setIsPremiumState(true);
+            await setIsPremium(true);
+          }
+        } catch (error: any) {
+          // Silently handle IAP unavailability - app will work with local storage state
+          if (error?.message?.includes('E_IAP_NOT_AVAILABLE')) {
+            console.warn('IAP not available - using local storage state');
+          } else {
+            console.error('Error checking premium status:', error);
+          }
         }
       }
 
@@ -158,8 +167,13 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
         setProducts(availableProducts);
         console.log('Products fetched:', availableProducts);
       }
-    } catch (error) {
-      console.error('Error initializing IAP:', error);
+    } catch (error: any) {
+      // Gracefully handle when IAP is not available (e.g., simulator, unsupported platform)
+      if (error?.message?.includes('E_IAP_NOT_AVAILABLE')) {
+        console.warn('IAP not available on this device/platform - this is expected in simulator or development');
+      } else {
+        console.error('Error initializing IAP:', error);
+      }
     }
   }, []);
 
@@ -273,23 +287,46 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
 
   // Initialize on mount
   useEffect(() => {
-    loadInitialData();
-    initializeIAP();
+    // Wrap everything in try-catch to handle any IAP-related errors
+    const initialize = async () => {
+      try {
+        await loadInitialData();
+        await initializeIAP();
+      } catch (error: any) {
+        if (!error?.message?.includes('E_IAP_NOT_AVAILABLE')) {
+          console.error('Error during initialization:', error);
+        }
+      }
+    };
+
+    initialize();
 
     // Setup purchase listeners
     let cleanupListeners: (() => void) | undefined;
 
     if (Platform.OS === 'ios') {
-      cleanupListeners = setupPurchaseListeners(
-        handlePurchaseSuccess,
-        handlePurchaseError
-      );
+      try {
+        cleanupListeners = setupPurchaseListeners(
+          handlePurchaseSuccess,
+          handlePurchaseError
+        );
+      } catch (error: any) {
+        if (error?.message?.includes('E_IAP_NOT_AVAILABLE')) {
+          console.warn('IAP listeners not available - running without IAP support');
+        } else {
+          console.error('Error setting up purchase listeners:', error);
+        }
+      }
     }
 
     // Cleanup on unmount
     return () => {
       if (cleanupListeners) {
-        cleanupListeners();
+        try {
+          cleanupListeners();
+        } catch (error) {
+          // Silently handle cleanup errors
+        }
       }
       disconnectIAP();
     };

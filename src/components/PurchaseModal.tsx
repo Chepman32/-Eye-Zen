@@ -94,13 +94,11 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
             <Pressable
               onPress={handlePurchase}
               disabled={isLoading}
-              style={styles.purchaseButtonWrapper}
-              android_ripple={{
-                color: 'rgba(255,255,255,0.3)',
-                borderless: false,
-              }}>
+              style={styles.purchaseButtonWrapper}>
               <LinearGradient
                 colors={['#4CAF50', '#81C784']}
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 0}}
                 style={styles.purchaseButton}>
                 {isLoading ? (
                   <ActivityIndicator color="#FFFFFF" />
@@ -214,15 +212,17 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   purchaseButton: {
-    paddingVertical: 16,
+    height: 56,
+    paddingHorizontal: 32,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   purchaseButtonText: {
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   restoreButton: {
     paddingVertical: 12,

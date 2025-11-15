@@ -10,7 +10,7 @@ import Animated, {
   Easing,
   runOnJS,
 } from 'react-native-reanimated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../services/asyncStorageAdapter';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 

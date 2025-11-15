@@ -15,6 +15,10 @@ import type { RootStackParamList } from '../../App';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { usePurchase } from '../contexts/PurchaseContext';
 import { PurchaseModal } from '../components/PurchaseModal';
+import {
+  enableScreenSecurity,
+  disableScreenSecurity,
+} from '../utils/screenSecurity';
 
 const source = require('../../assets/video/video.mp4');
 
@@ -41,8 +45,10 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
   useFocusEffect(
     React.useCallback(() => {
       Orientation.lockToLandscape();
+      enableScreenSecurity();
       return () => {
         Orientation.lockToPortrait();
+        disableScreenSecurity();
       };
     }, [])
   );

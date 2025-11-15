@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import { usePurchase } from '../contexts/PurchaseContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../services/asyncStorageAdapter';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   },
   paywallOverlay: {
     position: 'absolute',
-    bottom: 5,
+    bottom: 35,
     left: 0,
     right: 0,
     alignItems: 'center',

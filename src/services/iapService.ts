@@ -37,7 +37,7 @@ export type { PurchaseError, Product, Purchase } from 'react-native-iap';
 
 // Product IDs - MUST match exactly what you create in App Store Connect
 export const PRODUCT_IDS = {
-  PREMIUM_VIDEOS: 'com.eyezen.dailyfive', // iOS product ID
+  PREMIUM_VIDEOS: 'com.eyeszen.antonchepur.app.dailyfive', // iOS product ID
 } as const;
 
 // iOS product IDs array

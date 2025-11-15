@@ -8,7 +8,7 @@ Your app now supports a **one-time, non-consumable** in-app purchase that unlock
 - **Free users**: 1 video per day
 - **Premium users**: 5 videos per day
 
-**Product ID**: `com.eyezen.dailyfive`
+**Product ID**: `com.eyeszen.antonchepur.app.dailyfive`
 
 ---
 
@@ -75,7 +75,7 @@ Your app now supports a **one-time, non-consumable** in-app purchase that unlock
    - This is only visible to you, not users
 
 5. Fill in the **Product ID**:
-   - **IMPORTANT**: Must be exactly: `com.eyezen.dailyfive`
+   - **IMPORTANT**: Must be exactly: `com.eyeszen.antonchepur.app.dailyfive`
    - This must match what's in your code!
 
 6. Click **"Create"**
@@ -226,7 +226,7 @@ Sandbox accounts let you test purchases without real money.
 ### Problem: "Product not found" or products array is empty
 
 **Solution:**
-- Verify the product ID is exactly `com.eyezen.dailyfive`
+- Verify the product ID is exactly `com.eyeszen.antonchepur.app.dailyfive`
 - Check that the product exists in App Store Connect
 - Make sure you clicked "Save" on the product in App Store Connect
 - Wait a few hours - new products can take time to propagate

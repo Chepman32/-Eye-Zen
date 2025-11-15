@@ -178,13 +178,31 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
    * Handle purchase error
    */
   const handlePurchaseError = useCallback((error: PurchaseError) => {
-    if (error.code !== 'E_USER_CANCELLED') {
-      Alert.alert(
-        'Purchase Failed',
-        'There was an error processing your purchase. Please try again.',
-        [{ text: 'OK' }]
-      );
+    if (error.code === 'E_USER_CANCELLED') {
+      console.log('User cancelled purchase');
+      return;
     }
+
+    console.error('Purchase error:', error);
+
+    // Provide more specific error messages
+    let title = 'Purchase Failed';
+    let message = 'There was an error processing your purchase. Please try again.';
+
+    if (error.code === 'E_IAP_NOT_AVAILABLE') {
+      title = 'Purchases Not Available';
+      message = 'In-app purchases are not available on this device or simulator.';
+    } else if (error.code === 'E_UNKNOWN') {
+      title = 'Setup Required';
+      message = 'The purchase product is not configured. Please set up the in-app purchase in App Store Connect and sign in with a sandbox test account. See IAP_SETUP_GUIDE.md for details.';
+    } else if (error.code === 'E_NETWORK_ERROR') {
+      title = 'Network Error';
+      message = 'Please check your internet connection and try again.';
+    } else if (error.message) {
+      message = `Error: ${error.message}\n\nCode: ${error.code}`;
+    }
+
+    Alert.alert(title, message, [{ text: 'OK' }]);
   }, []);
 
   /**

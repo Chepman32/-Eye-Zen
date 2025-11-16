@@ -1,5 +1,6 @@
 import i18n from 'i18next';
 import {initReactI18next} from 'react-i18next';
+import {NativeModules, Platform} from 'react-native';
 import {storageService} from '../services/storageService';
 
 // Import translations
@@ -48,16 +49,51 @@ export const languages: {code: Language; name: string; nativeName: string}[] = [
   {code: 'uk', name: 'Ukrainian', nativeName: 'Українська'},
 ];
 
+const FALLBACK_LANGUAGE: Language = 'en';
+
+const getDeviceLanguage = (): Language => {
+  try {
+    const locale =
+      Platform.OS === 'ios'
+        ? NativeModules.SettingsManager?.settings?.AppleLocale ||
+          NativeModules.SettingsManager?.settings?.AppleLanguages?.[0]
+        : NativeModules.I18nManager?.localeIdentifier;
+
+    if (!locale || typeof locale !== 'string') {
+      return FALLBACK_LANGUAGE;
+    }
+
+    const normalized = locale.replace('_', '-').split('-')[0]?.toLowerCase();
+
+    if (normalized && normalized in resources) {
+      return normalized as Language;
+    }
+  } catch (error) {
+    console.warn('Failed to detect device language, falling back to English:', error);
+  }
+
+  return FALLBACK_LANGUAGE;
+};
+
+const getInitialLanguage = async (): Promise<Language> => {
+  const savedLanguage = await storageService.getItem<Language>('language_preference');
+
+  if (savedLanguage && savedLanguage in resources) {
+    return savedLanguage;
+  }
+
+  return getDeviceLanguage();
+};
+
 // Initialize i18n
 const initI18n = async () => {
-  try {
-    // Try to load saved language preference
-    const savedLanguage = await storageService.getItem<Language>('language_preference');
+  const initialLanguage = await getInitialLanguage();
 
+  try {
     await i18n.use(initReactI18next).init({
       resources,
-      lng: savedLanguage || 'en',
-      fallbackLng: 'en',
+      lng: initialLanguage,
+      fallbackLng: FALLBACK_LANGUAGE,
       compatibilityJSON: 'v4',
       interpolation: {
         escapeValue: false,
@@ -68,8 +104,8 @@ const initI18n = async () => {
     // Fallback initialization
     await i18n.use(initReactI18next).init({
       resources,
-      lng: 'en',
-      fallbackLng: 'en',
+      lng: initialLanguage,
+      fallbackLng: FALLBACK_LANGUAGE,
       compatibilityJSON: 'v4',
       interpolation: {
         escapeValue: false,

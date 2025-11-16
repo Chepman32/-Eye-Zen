@@ -1,0 +1,80 @@
+{
+  "common": {
+    "start": "Inizia",
+    "skip": "Salta",
+    "next": "Avanti",
+    "close": "Chiudi",
+    "cancel": "Annulla",
+    "ok": "OK",
+    "save": "Salva",
+    "done": "Fatto"
+  },
+  "splash": {
+    "title": "Riposo per gli Occhi"
+  },
+  "onboarding": {
+    "skip": "Salta",
+    "next": "Avanti",
+    "benefit": "Invece di una sessione giornaliera, fai fino a cinque al giorno",
+    "oneTimePayment": "pagamento unico",
+    "processing": "Elaborazione...",
+    "unlockPremium": "Sblocca Premium"
+  },
+  "home": {
+    "start": "Inizia"
+  },
+  "premium": {
+    "premiumActive": "⭐ Premium Attivo",
+    "freePlan": "Piano Gratuito",
+    "videosRemaining": "Video rimanenti oggi",
+    "upgradeToPremium": "⭐ Passa a Premium",
+    "watchUpTo5": "Guarda fino a 5 video al giorno con premium!"
+  },
+  "purchaseModal": {
+    "title": "Passa a Premium",
+    "subtitle": "Guarda più video ogni giorno",
+    "feature1": "Guarda fino a",
+    "feature1Value": "5 video",
+    "feature1Suffix": "al giorno",
+    "feature2": "Acquisto unico",
+    "feature3": "Accesso a vita",
+    "feature4": "Sostieni lo sviluppo",
+    "oneTimePayment": "Pagamento unico",
+    "purchaseNow": "Acquista Ora",
+    "restorePurchase": "Ripristina Acquisto",
+    "maybeLater": "Forse Dopo"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "appearance": "Aspetto",
+    "theme": "Tema",
+    "language": "Lingua",
+    "audio": "Audio",
+    "sound": "Suono",
+    "haptics": "Aptica",
+    "about": "Informazioni",
+    "version": "Versione",
+    "selectTheme": "Seleziona Tema",
+    "selectLanguage": "Seleziona Lingua"
+  },
+  "themes": {
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "solar": "Solare",
+    "mono": "Mono"
+  },
+  "languages": {
+    "en": "Inglese",
+    "ru": "Russo",
+    "es": "Spagnolo",
+    "de": "Tedesco",
+    "fr": "Francese",
+    "pt": "Portoghese",
+    "ja": "Giapponese",
+    "it": "Italiano",
+    "pl": "Polacco",
+    "zh": "Cinese",
+    "hi": "Hindi",
+    "uk": "Ucraino"
+  }
+}

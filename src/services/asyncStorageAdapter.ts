@@ -47,7 +47,7 @@ const createResilientStorage = (storage: AsyncStorageSubset): AsyncStorageSubset
 
       if (isManifestError && retries > 0) {
         // Wait a bit before retrying
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise<void>(resolve => setTimeout(() => resolve(), delay));
         return retryOperation(operation, retries - 1, delay * 2);
       }
 

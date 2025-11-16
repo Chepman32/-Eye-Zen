@@ -1,0 +1,80 @@
+{
+  "common": {
+    "start": "開始",
+    "skip": "スキップ",
+    "next": "次へ",
+    "close": "閉じる",
+    "cancel": "キャンセル",
+    "ok": "OK",
+    "save": "保存",
+    "done": "完了"
+  },
+  "splash": {
+    "title": "目の休憩"
+  },
+  "onboarding": {
+    "skip": "スキップ",
+    "next": "次へ",
+    "benefit": "1日1回ではなく、最大5回まで",
+    "oneTimePayment": "一回払い",
+    "processing": "処理中...",
+    "unlockPremium": "プレミアムをアンロック"
+  },
+  "home": {
+    "start": "開始"
+  },
+  "premium": {
+    "premiumActive": "⭐ プレミアム有効",
+    "freePlan": "無料プラン",
+    "videosRemaining": "本日の残り動画数",
+    "upgradeToPremium": "⭐ プレミアムにアップグレード",
+    "watchUpTo5": "プレミアムで1日最大5本の動画を視聴！"
+  },
+  "purchaseModal": {
+    "title": "プレミアムにアップグレード",
+    "subtitle": "毎日より多くの動画を視聴",
+    "feature1": "最大",
+    "feature1Value": "5本の動画",
+    "feature1Suffix": "を毎日視聴",
+    "feature2": "一回の購入",
+    "feature3": "生涯アクセス",
+    "feature4": "開発をサポート",
+    "oneTimePayment": "一回払い",
+    "purchaseNow": "今すぐ購入",
+    "restorePurchase": "購入を復元",
+    "maybeLater": "後で"
+  },
+  "settings": {
+    "title": "設定",
+    "appearance": "外観",
+    "theme": "テーマ",
+    "language": "言語",
+    "audio": "オーディオ",
+    "sound": "サウンド",
+    "haptics": "触覚",
+    "about": "について",
+    "version": "バージョン",
+    "selectTheme": "テーマを選択",
+    "selectLanguage": "言語を選択"
+  },
+  "themes": {
+    "light": "ライト",
+    "dark": "ダーク",
+    "solar": "ソーラー",
+    "mono": "モノ"
+  },
+  "languages": {
+    "en": "英語",
+    "ru": "ロシア語",
+    "es": "スペイン語",
+    "de": "ドイツ語",
+    "fr": "フランス語",
+    "pt": "ポルトガル語",
+    "ja": "日本語",
+    "it": "イタリア語",
+    "pl": "ポーランド語",
+    "zh": "中国語",
+    "hi": "ヒンディー語",
+    "uk": "ウクライナ語"
+  }
+}

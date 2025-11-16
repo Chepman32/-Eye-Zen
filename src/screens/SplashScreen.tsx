@@ -13,6 +13,8 @@ import Animated, {
 import AsyncStorage from '../services/asyncStorageAdapter';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
+import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 const SplashScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Splash'>> = ({ navigation }) => {
   const logoScale = useSharedValue(0.5);
@@ -20,6 +22,8 @@ const SplashScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Splash'
   const containerOpacity = useSharedValue(1);
   const containerTranslateY = useSharedValue(0);
   const [nextScreen, setNextScreen] = useState<'Onboarding' | 'Home'>('Home');
+  const { theme } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Check if onboarding was completed
@@ -42,7 +46,7 @@ const SplashScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Splash'
 
     const timeout = setTimeout(() => {
       containerOpacity.value = withTiming(0, { duration: 350, easing: Easing.out(Easing.quad) });
-      containerTranslateY.value = withTiming(-20, { duration: 350 }, (finished: boolean) => {
+      containerTranslateY.value = withTiming(-20, { duration: 350 }, (finished) => {
         if (finished) runOnJS(navigation.replace)(nextScreen);
       });
     }, 2000);
@@ -59,15 +63,15 @@ const SplashScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Splash'
 
   return (
     <Animated.View style={[styles.flex, containerStyle]}>
-      <LinearGradient colors={["#C8FCEA", "#FFFFFF"]} style={styles.flex}>
+      <LinearGradient colors={[theme.colors.gradientEnd, theme.colors.background]} style={styles.flex}>
         <View style={styles.center}>
           <Animated.View style={[styles.logo, logoStyle]}>
             {/* Simple eye shape using two circles */}
-            <View style={styles.eyeOuter}>
-              <View style={styles.eyeInner} />
+            <View style={[styles.eyeOuter, { borderColor: theme.colors.primary, backgroundColor: `${theme.colors.primary}14` }]}>
+              <View style={[styles.eyeInner, { backgroundColor: theme.colors.primary }]} />
             </View>
           </Animated.View>
-          <Animated.Text style={[styles.title, textStyle]}>Отдыхалка для глаз</Animated.Text>
+          <Animated.Text style={[styles.title, { color: theme.colors.primaryDark }, textStyle]}>{t('splash.title')}</Animated.Text>
         </View>
       </LinearGradient>
     </Animated.View>
@@ -83,22 +87,18 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 35,
     borderWidth: 4,
-    borderColor: '#4CAF50',
     alignItems: 'center',
     justifyContent: 'center',
     transform: [{ rotate: '0deg' }],
-    backgroundColor: 'rgba(76, 175, 80, 0.08)',
   },
   eyeInner: {
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: '#4CAF50',
   },
   title: {
     marginTop: 16,
     fontSize: 20,
-    color: '#2E7D32',
     fontWeight: '600',
   },
 });

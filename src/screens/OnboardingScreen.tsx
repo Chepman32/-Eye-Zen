@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
 import type { RootStackParamList } from '../../App';
 import { usePurchase } from '../contexts/PurchaseContext';
 import AsyncStorage from '../services/asyncStorageAdapter';
@@ -50,6 +52,8 @@ const slides: OnboardingSlide[] = [
 const OnboardingScreen: React.FC<
   NativeStackScreenProps<RootStackParamList, 'Onboarding'>
 > = ({ navigation }) => {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const { products, purchase, isLoading } = usePurchase();
@@ -105,30 +109,32 @@ const OnboardingScreen: React.FC<
           <>
             {/* Close Button - top right */}
             <Pressable onPress={handleSkip} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>✕</Text>
+              <Text style={[styles.closeButtonText, { color: theme.colors.text }]}>✕</Text>
             </Pressable>
 
             <View style={styles.paywallOverlay}>
               {/* Benefit Text */}
-              <View style={styles.benefitContainer}>
-                <Text style={styles.benefitText}>
-                  Instead of one daily session, do up to five a day
+              <View style={[styles.benefitContainer, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.benefitText, { color: theme.colors.text }]}>
+                  {t('onboarding.benefit')}
                 </Text>
               </View>
 
               {/* Price Badge */}
-              <View style={styles.priceBadge}>
-                <Text style={styles.priceText}>{price}</Text>
-                <Text style={styles.priceSubtext}>one-time payment</Text>
+              <View style={[styles.priceBadge, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.priceText, { color: theme.colors.text }]}>{price}</Text>
+                <Text style={[styles.priceSubtext, { color: theme.colors.textSecondary }]}>
+                  {t('onboarding.oneTimePayment')}
+                </Text>
               </View>
 
               {/* Purchase Button */}
               <Pressable
-                style={styles.purchaseButton}
+                style={[styles.purchaseButton, { backgroundColor: theme.colors.buttonPrimary }]}
                 onPress={handlePurchase}
                 disabled={isLoading}>
-                <Text style={styles.purchaseButtonText}>
-                  {isLoading ? 'Processing...' : 'Unlock Premium'}
+                <Text style={[styles.purchaseButtonText, { color: theme.colors.buttonText }]}>
+                  {isLoading ? t('onboarding.processing') : t('onboarding.unlockPremium')}
                 </Text>
               </Pressable>
             </View>
@@ -141,7 +147,7 @@ const OnboardingScreen: React.FC<
   const isLastSlide = currentIndex === slides.length - 1;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top', 'bottom']}>
       <FlatList
         ref={flatListRef}
         data={slides}
@@ -165,7 +171,8 @@ const OnboardingScreen: React.FC<
                 key={index}
                 style={[
                   styles.dot,
-                  index === currentIndex && styles.dotActive,
+                  { backgroundColor: theme.colors.border },
+                  index === currentIndex && [styles.dotActive, { backgroundColor: theme.colors.buttonPrimary }],
                 ]}
               />
             ))}
@@ -174,11 +181,15 @@ const OnboardingScreen: React.FC<
           {/* Action Buttons */}
           <View style={styles.buttonRow}>
             <Pressable onPress={handleSkip} style={styles.textButton}>
-              <Text style={styles.textButtonLabel}>Skip</Text>
+              <Text style={[styles.textButtonLabel, { color: theme.colors.textSecondary }]}>
+                {t('onboarding.skip')}
+              </Text>
             </Pressable>
 
-            <Pressable onPress={handleNext} style={styles.nextButton}>
-              <Text style={styles.nextButtonText}>Next</Text>
+            <Pressable onPress={handleNext} style={[styles.nextButton, { backgroundColor: theme.colors.buttonPrimary }]}>
+              <Text style={[styles.nextButtonText, { color: theme.colors.buttonText }]}>
+                {t('onboarding.next')}
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -190,7 +201,6 @@ const OnboardingScreen: React.FC<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   slide: {
     width: SCREEN_WIDTH,
@@ -210,7 +220,6 @@ const styles = StyleSheet.create({
     paddingTop: 0
   },
   benefitContainer: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingHorizontal: 20,
     paddingVertical: 12,
@@ -220,12 +229,10 @@ const styles = StyleSheet.create({
   benefitText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#2C3E50',
     textAlign: 'center',
     lineHeight: 20,
   },
   priceBadge: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     paddingHorizontal: 32,
     paddingVertical: 20,
@@ -239,12 +246,10 @@ const styles = StyleSheet.create({
   priceText: {
     fontSize: 42,
     fontWeight: '700',
-    color: '#2C3E50',
     textAlign: 'center',
   },
   priceSubtext: {
     fontSize: 16,
-    color: '#7F8C8D',
     textAlign: 'center',
     marginTop: 6,
   },
@@ -260,12 +265,10 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   closeButtonText: {
-    color: '#090909ff',
     fontSize: 24,
     fontWeight: '300',
   },
   purchaseButton: {
-    backgroundColor: '#5B4FB4',
     borderRadius: 28,
     paddingVertical: 18,
     paddingHorizontal: 48,
@@ -278,7 +281,6 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   purchaseButtonText: {
-    color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '700',
   },
@@ -299,12 +301,10 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#D1D5DB',
     marginHorizontal: 4,
   },
   dotActive: {
     width: 24,
-    backgroundColor: '#5B4FB4',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -318,16 +318,13 @@ const styles = StyleSheet.create({
   textButtonLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#7F8C8D',
   },
   nextButton: {
-    backgroundColor: '#5B4FB4',
     borderRadius: 24,
     paddingVertical: 14,
     paddingHorizontal: 32,
   },
   nextButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },

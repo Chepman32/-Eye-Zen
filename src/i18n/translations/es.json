@@ -1,0 +1,80 @@
+{
+  "common": {
+    "start": "Comenzar",
+    "skip": "Saltar",
+    "next": "Siguiente",
+    "close": "Cerrar",
+    "cancel": "Cancelar",
+    "ok": "OK",
+    "save": "Guardar",
+    "done": "Hecho"
+  },
+  "splash": {
+    "title": "Descanso para los Ojos"
+  },
+  "onboarding": {
+    "skip": "Saltar",
+    "next": "Siguiente",
+    "benefit": "En lugar de una sesión diaria, haz hasta cinco al día",
+    "oneTimePayment": "pago único",
+    "processing": "Procesando...",
+    "unlockPremium": "Desbloquear Premium"
+  },
+  "home": {
+    "start": "Comenzar"
+  },
+  "premium": {
+    "premiumActive": "⭐ Premium Activo",
+    "freePlan": "Plan Gratuito",
+    "videosRemaining": "Videos restantes hoy",
+    "upgradeToPremium": "⭐ Actualizar a Premium",
+    "watchUpTo5": "¡Mira hasta 5 videos al día con premium!"
+  },
+  "purchaseModal": {
+    "title": "Actualizar a Premium",
+    "subtitle": "Mira más videos diariamente",
+    "feature1": "Mira hasta",
+    "feature1Value": "5 videos",
+    "feature1Suffix": "por día",
+    "feature2": "Compra única",
+    "feature3": "Acceso de por vida",
+    "feature4": "Apoya el desarrollo",
+    "oneTimePayment": "Pago único",
+    "purchaseNow": "Comprar Ahora",
+    "restorePurchase": "Restaurar Compra",
+    "maybeLater": "Tal Vez Después"
+  },
+  "settings": {
+    "title": "Configuración",
+    "appearance": "Apariencia",
+    "theme": "Tema",
+    "language": "Idioma",
+    "audio": "Audio",
+    "sound": "Sonido",
+    "haptics": "Hápticos",
+    "about": "Acerca de",
+    "version": "Versión",
+    "selectTheme": "Seleccionar Tema",
+    "selectLanguage": "Seleccionar Idioma"
+  },
+  "themes": {
+    "light": "Claro",
+    "dark": "Oscuro",
+    "solar": "Solar",
+    "mono": "Mono"
+  },
+  "languages": {
+    "en": "Inglés",
+    "ru": "Ruso",
+    "es": "Español",
+    "de": "Alemán",
+    "fr": "Francés",
+    "pt": "Portugués",
+    "ja": "Japonés",
+    "it": "Italiano",
+    "pl": "Polaco",
+    "zh": "Chino",
+    "hi": "Hindi",
+    "uk": "Ucraniano"
+  }
+}

@@ -2,10 +2,18 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Haptic from 'react-native-haptic-feedback';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
 import { useVideoLimit } from '../hooks/useVideoLimit';
 import { PurchaseModal } from './PurchaseModal';
 
-export const PremiumStatus: React.FC = () => {
+type PremiumStatusProps = {
+  topOffset?: number;
+};
+
+export const PremiumStatus: React.FC<PremiumStatusProps> = ({ topOffset = 60 }) => {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
   const {
     isPremium,
     remainingVideos,
@@ -22,35 +30,40 @@ export const PremiumStatus: React.FC = () => {
 
   return (
     <>
-      <View style={styles.container}>
+      <View style={[styles.container, { top: topOffset }]}>
         {/* Status Card */}
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: theme.colors.card }]}>
           <View style={styles.header}>
-            <Text style={styles.title}>
-              {isPremium ? '⭐ Premium Active' : 'Free Plan'}
+            <Text style={[styles.title, { color: theme.colors.text }]}>
+              {isPremium ? t('premium.premiumActive') : t('premium.freePlan')}
             </Text>
           </View>
 
           {/* Video Count */}
           <View style={styles.countContainer}>
-            <Text style={styles.countLabel}>Videos remaining today</Text>
+            <Text style={[styles.countLabel, { color: theme.colors.textSecondary }]}>
+              {t('premium.videosRemaining')}
+            </Text>
             <View style={styles.countRow}>
               <Text
                 style={[
                   styles.countNumber,
-                  !canWatchVideo && styles.countNumberZero,
+                  { color: theme.colors.success },
+                  !canWatchVideo && { color: theme.colors.error },
                 ]}>
                 {remainingVideos}
               </Text>
-              <Text style={styles.countTotal}> / {maxDailyLimit}</Text>
+              <Text style={[styles.countTotal, { color: theme.colors.textTertiary }]}>
+                {' / '}{maxDailyLimit}
+              </Text>
             </View>
           </View>
 
           {/* Progress Bar */}
           <View style={styles.progressBarContainer}>
-            <View style={styles.progressBarBackground}>
+            <View style={[styles.progressBarBackground, { backgroundColor: theme.colors.border }]}>
               <LinearGradient
-                colors={['#4CAF50', '#81C784']}
+                colors={[theme.colors.gradientStart, theme.colors.gradientEnd]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={[
@@ -73,10 +86,10 @@ export const PremiumStatus: React.FC = () => {
                 borderless: false,
               }}>
               <LinearGradient
-                colors={['#4CAF50', '#81C784']}
+                colors={[theme.colors.gradientStart, theme.colors.gradientEnd]}
                 style={styles.upgradeButton}>
-                <Text style={styles.upgradeButtonText}>
-                  ⭐ Upgrade to Premium
+                <Text style={[styles.upgradeButtonText, { color: theme.colors.buttonText }]}>
+                  {t('premium.upgradeToPremium')}
                 </Text>
               </LinearGradient>
             </Pressable>
@@ -84,8 +97,8 @@ export const PremiumStatus: React.FC = () => {
 
           {/* Premium Benefits (only for free users) */}
           {!isPremium && (
-            <Text style={styles.benefitText}>
-              Watch up to 5 videos per day with premium!
+            <Text style={[styles.benefitText, { color: theme.colors.textTertiary }]}>
+              {t('premium.watchUpTo5')}
             </Text>
           )}
         </View>
@@ -103,12 +116,10 @@ export const PremiumStatus: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: 60,
     left: 20,
     right: 20,
   },
   card: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     shadowColor: '#000',
@@ -123,14 +134,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#333',
   },
   countContainer: {
     marginBottom: 12,
   },
   countLabel: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 8,
   },
   countRow: {
@@ -140,22 +149,16 @@ const styles = StyleSheet.create({
   countNumber: {
     fontSize: 36,
     fontWeight: '700',
-    color: '#4CAF50',
-  },
-  countNumberZero: {
-    color: '#FF5252',
   },
   countTotal: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#999',
   },
   progressBarContainer: {
     marginBottom: 16,
   },
   progressBarBackground: {
     height: 8,
-    backgroundColor: '#E0E0E0',
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -175,13 +178,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   upgradeButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },
   benefitText: {
     fontSize: 13,
-    color: '#999',
     textAlign: 'center',
   },
 });

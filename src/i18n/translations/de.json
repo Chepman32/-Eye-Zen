@@ -1,0 +1,80 @@
+{
+  "common": {
+    "start": "Start",
+    "skip": "Überspringen",
+    "next": "Weiter",
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "ok": "OK",
+    "save": "Speichern",
+    "done": "Fertig"
+  },
+  "splash": {
+    "title": "Augenpause"
+  },
+  "onboarding": {
+    "skip": "Überspringen",
+    "next": "Weiter",
+    "benefit": "Statt einer täglichen Sitzung bis zu fünf am Tag",
+    "oneTimePayment": "einmalige Zahlung",
+    "processing": "Verarbeitung...",
+    "unlockPremium": "Premium Freischalten"
+  },
+  "home": {
+    "start": "Start"
+  },
+  "premium": {
+    "premiumActive": "⭐ Premium Aktiv",
+    "freePlan": "Kostenloser Plan",
+    "videosRemaining": "Verbleibende Videos heute",
+    "upgradeToPremium": "⭐ Auf Premium Upgraden",
+    "watchUpTo5": "Schaue bis zu 5 Videos pro Tag mit Premium!"
+  },
+  "purchaseModal": {
+    "title": "Auf Premium Upgraden",
+    "subtitle": "Schaue täglich mehr Videos",
+    "feature1": "Schaue bis zu",
+    "feature1Value": "5 Videos",
+    "feature1Suffix": "pro Tag",
+    "feature2": "Einmaliger Kauf",
+    "feature3": "Lebenslanger Zugriff",
+    "feature4": "Unterstütze die Entwicklung",
+    "oneTimePayment": "Einmalige Zahlung",
+    "purchaseNow": "Jetzt Kaufen",
+    "restorePurchase": "Kauf Wiederherstellen",
+    "maybeLater": "Vielleicht Später"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "appearance": "Erscheinungsbild",
+    "theme": "Design",
+    "language": "Sprache",
+    "audio": "Audio",
+    "sound": "Ton",
+    "haptics": "Haptik",
+    "about": "Über",
+    "version": "Version",
+    "selectTheme": "Design Auswählen",
+    "selectLanguage": "Sprache Auswählen"
+  },
+  "themes": {
+    "light": "Hell",
+    "dark": "Dunkel",
+    "solar": "Solar",
+    "mono": "Mono"
+  },
+  "languages": {
+    "en": "Englisch",
+    "ru": "Russisch",
+    "es": "Spanisch",
+    "de": "Deutsch",
+    "fr": "Französisch",
+    "pt": "Portugiesisch",
+    "ja": "Japanisch",
+    "it": "Italienisch",
+    "pl": "Polnisch",
+    "zh": "Chinesisch",
+    "hi": "Hindi",
+    "uk": "Ukrainisch"
+  }
+}

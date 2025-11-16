@@ -14,6 +14,43 @@ export interface StorageData {
 }
 
 /**
+ * Generic storage service for key-value pairs
+ */
+export const storageService = {
+  async getItem<T>(key: string): Promise<T | null> {
+    try {
+      const value = await AsyncStorage.getItem(`@eyezen_${key}`);
+      if (value === null) return null;
+      try {
+        return JSON.parse(value) as T;
+      } catch {
+        return value as T;
+      }
+    } catch (error) {
+      console.error(`Error reading ${key}:`, error);
+      return null;
+    }
+  },
+
+  async setItem<T>(key: string, value: T): Promise<void> {
+    try {
+      const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
+      await AsyncStorage.setItem(`@eyezen_${key}`, stringValue);
+    } catch (error) {
+      console.error(`Error saving ${key}:`, error);
+    }
+  },
+
+  async removeItem(key: string): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(`@eyezen_${key}`);
+    } catch (error) {
+      console.error(`Error removing ${key}:`, error);
+    }
+  },
+};
+
+/**
  * Get premium status from storage
  */
 export const getIsPremium = async (): Promise<boolean> => {

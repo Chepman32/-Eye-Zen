@@ -1,0 +1,92 @@
+import i18n from 'i18next';
+import {initReactI18next} from 'react-i18next';
+import {storageService} from '../services/storageService';
+
+// Import translations
+import en from './translations/en.json';
+import ru from './translations/ru.json';
+import es from './translations/es.json';
+import de from './translations/de.json';
+import fr from './translations/fr.json';
+import pt from './translations/pt.json';
+import ja from './translations/ja.json';
+import it from './translations/it.json';
+import pl from './translations/pl.json';
+import zh from './translations/zh.json';
+import hi from './translations/hi.json';
+import uk from './translations/uk.json';
+
+export const resources = {
+  en: {translation: en},
+  ru: {translation: ru},
+  es: {translation: es},
+  de: {translation: de},
+  fr: {translation: fr},
+  pt: {translation: pt},
+  ja: {translation: ja},
+  it: {translation: it},
+  pl: {translation: pl},
+  zh: {translation: zh},
+  hi: {translation: hi},
+  uk: {translation: uk},
+};
+
+export type Language = keyof typeof resources;
+
+export const languages: {code: Language; name: string; nativeName: string}[] = [
+  {code: 'en', name: 'English', nativeName: 'English'},
+  {code: 'ru', name: 'Russian', nativeName: 'Русский'},
+  {code: 'es', name: 'Spanish', nativeName: 'Español'},
+  {code: 'de', name: 'German', nativeName: 'Deutsch'},
+  {code: 'fr', name: 'French', nativeName: 'Français'},
+  {code: 'pt', name: 'Portuguese', nativeName: 'Português'},
+  {code: 'ja', name: 'Japanese', nativeName: '日本語'},
+  {code: 'it', name: 'Italian', nativeName: 'Italiano'},
+  {code: 'pl', name: 'Polish', nativeName: 'Polski'},
+  {code: 'zh', name: 'Chinese', nativeName: '中文'},
+  {code: 'hi', name: 'Hindi', nativeName: 'हिन्दी'},
+  {code: 'uk', name: 'Ukrainian', nativeName: 'Українська'},
+];
+
+// Initialize i18n
+const initI18n = async () => {
+  try {
+    // Try to load saved language preference
+    const savedLanguage = await storageService.getItem<Language>('language_preference');
+
+    await i18n.use(initReactI18next).init({
+      resources,
+      lng: savedLanguage || 'en',
+      fallbackLng: 'en',
+      compatibilityJSON: 'v4',
+      interpolation: {
+        escapeValue: false,
+      },
+    });
+  } catch (error) {
+    console.error('Error initializing i18n:', error);
+    // Fallback initialization
+    await i18n.use(initReactI18next).init({
+      resources,
+      lng: 'en',
+      fallbackLng: 'en',
+      compatibilityJSON: 'v4',
+      interpolation: {
+        escapeValue: false,
+      },
+    });
+  }
+};
+
+initI18n();
+
+export const changeLanguage = async (language: Language) => {
+  try {
+    await i18n.changeLanguage(language);
+    await storageService.setItem('language_preference', language);
+  } catch (error) {
+    console.error('Error changing language:', error);
+  }
+};
+
+export default i18n;

@@ -1,0 +1,80 @@
+{
+  "common": {
+    "start": "Commencer",
+    "skip": "Passer",
+    "next": "Suivant",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "ok": "OK",
+    "save": "Enregistrer",
+    "done": "Terminé"
+  },
+  "splash": {
+    "title": "Repos pour les Yeux"
+  },
+  "onboarding": {
+    "skip": "Passer",
+    "next": "Suivant",
+    "benefit": "Au lieu d'une session quotidienne, faites-en jusqu'à cinq par jour",
+    "oneTimePayment": "paiement unique",
+    "processing": "Traitement...",
+    "unlockPremium": "Débloquer Premium"
+  },
+  "home": {
+    "start": "Commencer"
+  },
+  "premium": {
+    "premiumActive": "⭐ Premium Actif",
+    "freePlan": "Plan Gratuit",
+    "videosRemaining": "Vidéos restantes aujourd'hui",
+    "upgradeToPremium": "⭐ Passer à Premium",
+    "watchUpTo5": "Regardez jusqu'à 5 vidéos par jour avec premium!"
+  },
+  "purchaseModal": {
+    "title": "Passer à Premium",
+    "subtitle": "Regardez plus de vidéos quotidiennement",
+    "feature1": "Regardez jusqu'à",
+    "feature1Value": "5 vidéos",
+    "feature1Suffix": "par jour",
+    "feature2": "Achat unique",
+    "feature3": "Accès à vie",
+    "feature4": "Soutenez le développement",
+    "oneTimePayment": "Paiement unique",
+    "purchaseNow": "Acheter Maintenant",
+    "restorePurchase": "Restaurer l'Achat",
+    "maybeLater": "Peut-être Plus Tard"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "appearance": "Apparence",
+    "theme": "Thème",
+    "language": "Langue",
+    "audio": "Audio",
+    "sound": "Son",
+    "haptics": "Haptique",
+    "about": "À propos",
+    "version": "Version",
+    "selectTheme": "Sélectionner un Thème",
+    "selectLanguage": "Sélectionner une Langue"
+  },
+  "themes": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "solar": "Solaire",
+    "mono": "Mono"
+  },
+  "languages": {
+    "en": "Anglais",
+    "ru": "Russe",
+    "es": "Espagnol",
+    "de": "Allemand",
+    "fr": "Français",
+    "pt": "Portugais",
+    "ja": "Japonais",
+    "it": "Italien",
+    "pl": "Polonais",
+    "zh": "Chinois",
+    "hi": "Hindi",
+    "uk": "Ukrainien"
+  }
+}

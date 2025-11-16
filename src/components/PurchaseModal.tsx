@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Haptic from 'react-native-haptic-feedback';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
 import { usePurchase } from '../contexts/PurchaseContext';
 
 const { width } = Dimensions.get('window');
@@ -25,6 +27,8 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   onClose,
   showRestoreButton = true,
 }) => {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
   const { purchase, restore, isLoading, products } = usePurchase();
 
   const handlePurchase = async () => {
@@ -51,41 +55,56 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
       transparent
       animationType="fade"
       onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
+      <View style={[styles.overlay, { backgroundColor: theme.colors.overlayDark }]}>
+        <View style={[styles.modalContainer, { backgroundColor: theme.colors.card }]}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Upgrade to Premium</Text>
-            <Text style={styles.subtitle}>Watch more videos daily</Text>
+            <Text style={[styles.title, { color: theme.colors.text }]}>
+              {t('purchaseModal.title')}
+            </Text>
+            <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+              {t('purchaseModal.subtitle')}
+            </Text>
           </View>
 
           {/* Features */}
           <View style={styles.features}>
             <View style={styles.featureRow}>
-              <Text style={styles.featureIcon}>✓</Text>
-              <Text style={styles.featureText}>
-                Watch up to <Text style={styles.highlight}>5 videos</Text> per
-                day
+              <Text style={[styles.featureIcon, { color: theme.colors.primary }]}>✓</Text>
+              <Text style={[styles.featureText, { color: theme.colors.textSecondary }]}>
+                {t('purchaseModal.feature1')}{' '}
+                <Text style={[styles.highlight, { color: theme.colors.primary }]}>
+                  {t('purchaseModal.feature1Value')}
+                </Text>{' '}
+                {t('purchaseModal.feature1Suffix')}
               </Text>
             </View>
             <View style={styles.featureRow}>
-              <Text style={styles.featureIcon}>✓</Text>
-              <Text style={styles.featureText}>One-time purchase</Text>
+              <Text style={[styles.featureIcon, { color: theme.colors.primary }]}>✓</Text>
+              <Text style={[styles.featureText, { color: theme.colors.textSecondary }]}>
+                {t('purchaseModal.feature2')}
+              </Text>
             </View>
             <View style={styles.featureRow}>
-              <Text style={styles.featureIcon}>✓</Text>
-              <Text style={styles.featureText}>Lifetime access</Text>
+              <Text style={[styles.featureIcon, { color: theme.colors.primary }]}>✓</Text>
+              <Text style={[styles.featureText, { color: theme.colors.textSecondary }]}>
+                {t('purchaseModal.feature3')}
+              </Text>
             </View>
             <View style={styles.featureRow}>
-              <Text style={styles.featureIcon}>✓</Text>
-              <Text style={styles.featureText}>Support development</Text>
+              <Text style={[styles.featureIcon, { color: theme.colors.primary }]}>✓</Text>
+              <Text style={[styles.featureText, { color: theme.colors.textSecondary }]}>
+                {t('purchaseModal.feature4')}
+              </Text>
             </View>
           </View>
 
           {/* Price */}
-          <View style={styles.priceContainer}>
-            <Text style={styles.priceLabel}>One-time payment</Text>
-            <Text style={styles.price}>{price}</Text>
+          <View style={[styles.priceContainer, { backgroundColor: theme.colors.backgroundSecondary }]}>
+            <Text style={[styles.priceLabel, { color: theme.colors.textSecondary }]}>
+              {t('purchaseModal.oneTimePayment')}
+            </Text>
+            <Text style={[styles.price, { color: theme.colors.primary }]}>{price}</Text>
           </View>
 
           {/* Buttons */}
@@ -96,14 +115,16 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               disabled={isLoading}
               style={styles.purchaseButtonWrapper}>
               <LinearGradient
-                colors={['#4CAF50', '#81C784']}
+                colors={[theme.colors.gradientStart, theme.colors.gradientEnd]}
                 start={{x: 0, y: 0}}
                 end={{x: 1, y: 0}}
                 style={styles.purchaseButton}>
                 {isLoading ? (
-                  <ActivityIndicator color="#FFFFFF" />
+                  <ActivityIndicator color={theme.colors.buttonText} />
                 ) : (
-                  <Text style={styles.purchaseButtonText}>Purchase Now</Text>
+                  <Text style={[styles.purchaseButtonText, { color: theme.colors.buttonText }]}>
+                    {t('purchaseModal.purchaseNow')}
+                  </Text>
                 )}
               </LinearGradient>
             </Pressable>
@@ -114,7 +135,9 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 onPress={handleRestore}
                 disabled={isLoading}
                 style={styles.restoreButton}>
-                <Text style={styles.restoreButtonText}>Restore Purchase</Text>
+                <Text style={[styles.restoreButtonText, { color: theme.colors.primary }]}>
+                  {t('purchaseModal.restorePurchase')}
+                </Text>
               </Pressable>
             )}
 
@@ -123,7 +146,9 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               onPress={handleClose}
               disabled={isLoading}
               style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>Maybe Later</Text>
+              <Text style={[styles.closeButtonText, { color: theme.colors.textTertiary }]}>
+                {t('purchaseModal.maybeLater')}
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -135,13 +160,11 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   modalContainer: {
     width: width * 0.85,
-    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 24,
     shadowColor: '#000',
@@ -157,12 +180,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '700',
-    color: '#333',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
   },
   features: {
     marginBottom: 24,
@@ -174,35 +195,29 @@ const styles = StyleSheet.create({
   },
   featureIcon: {
     fontSize: 20,
-    color: '#4CAF50',
     marginRight: 12,
     fontWeight: '700',
   },
   featureText: {
     fontSize: 16,
-    color: '#555',
     flex: 1,
   },
   highlight: {
     fontWeight: '700',
-    color: '#4CAF50',
   },
   priceContainer: {
     alignItems: 'center',
     marginBottom: 24,
     paddingVertical: 16,
-    backgroundColor: '#F5F5F5',
     borderRadius: 12,
   },
   priceLabel: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 4,
   },
   price: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#4CAF50',
   },
   buttons: {
     gap: 12,
@@ -219,7 +234,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   purchaseButtonText: {
-    color: '#FFFFFF',
     fontSize: 17,
     fontWeight: '600',
     letterSpacing: 0.5,
@@ -229,7 +243,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   restoreButtonText: {
-    color: '#4CAF50',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -238,7 +251,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeButtonText: {
-    color: '#999',
     fontSize: 16,
   },
 });

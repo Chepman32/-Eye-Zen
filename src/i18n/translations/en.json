@@ -1,0 +1,80 @@
+{
+  "common": {
+    "start": "Start",
+    "skip": "Skip",
+    "next": "Next",
+    "close": "Close",
+    "cancel": "Cancel",
+    "ok": "OK",
+    "save": "Save",
+    "done": "Done"
+  },
+  "splash": {
+    "title": "Eye Rest"
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "benefit": "Instead of one daily session, do up to five a day",
+    "oneTimePayment": "one-time payment",
+    "processing": "Processing...",
+    "unlockPremium": "Unlock Premium"
+  },
+  "home": {
+    "start": "Start"
+  },
+  "premium": {
+    "premiumActive": "⭐ Premium Active",
+    "freePlan": "Free Plan",
+    "videosRemaining": "Videos remaining today",
+    "upgradeToPremium": "⭐ Upgrade to Premium",
+    "watchUpTo5": "Watch up to 5 videos per day with premium!"
+  },
+  "purchaseModal": {
+    "title": "Upgrade to Premium",
+    "subtitle": "Watch more videos daily",
+    "feature1": "Watch up to",
+    "feature1Value": "5 videos",
+    "feature1Suffix": "per day",
+    "feature2": "One-time purchase",
+    "feature3": "Lifetime access",
+    "feature4": "Support development",
+    "oneTimePayment": "One-time payment",
+    "purchaseNow": "Purchase Now",
+    "restorePurchase": "Restore Purchase",
+    "maybeLater": "Maybe Later"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "language": "Language",
+    "audio": "Audio",
+    "sound": "Sound",
+    "haptics": "Haptics",
+    "about": "About",
+    "version": "Version",
+    "selectTheme": "Select Theme",
+    "selectLanguage": "Select Language"
+  },
+  "themes": {
+    "light": "Light",
+    "dark": "Dark",
+    "solar": "Solar",
+    "mono": "Mono"
+  },
+  "languages": {
+    "en": "English",
+    "ru": "Russian",
+    "es": "Spanish",
+    "de": "German",
+    "fr": "French",
+    "pt": "Portuguese",
+    "ja": "Japanese",
+    "it": "Italian",
+    "pl": "Polish",
+    "zh": "Chinese",
+    "hi": "Hindi",
+    "uk": "Ukrainian"
+  }
+}

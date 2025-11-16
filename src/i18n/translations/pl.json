@@ -1,0 +1,80 @@
+{
+  "common": {
+    "start": "Start",
+    "skip": "Pomiń",
+    "next": "Dalej",
+    "close": "Zamknij",
+    "cancel": "Anuluj",
+    "ok": "OK",
+    "save": "Zapisz",
+    "done": "Gotowe"
+  },
+  "splash": {
+    "title": "Odpoczynek dla Oczu"
+  },
+  "onboarding": {
+    "skip": "Pomiń",
+    "next": "Dalej",
+    "benefit": "Zamiast jednej sesji dziennie, wykonuj nawet pięć dziennie",
+    "oneTimePayment": "jednorazowa płatność",
+    "processing": "Przetwarzanie...",
+    "unlockPremium": "Odblokuj Premium"
+  },
+  "home": {
+    "start": "Start"
+  },
+  "premium": {
+    "premiumActive": "⭐ Premium Aktywne",
+    "freePlan": "Plan Darmowy",
+    "videosRemaining": "Pozostałe filmy dzisiaj",
+    "upgradeToPremium": "⭐ Przejdź na Premium",
+    "watchUpTo5": "Oglądaj do 5 filmów dziennie z premium!"
+  },
+  "purchaseModal": {
+    "title": "Przejdź na Premium",
+    "subtitle": "Oglądaj więcej filmów codziennie",
+    "feature1": "Oglądaj do",
+    "feature1Value": "5 filmów",
+    "feature1Suffix": "dziennie",
+    "feature2": "Jednorazowy zakup",
+    "feature3": "Dostęp dożywotni",
+    "feature4": "Wspieraj rozwój",
+    "oneTimePayment": "Jednorazowa płatność",
+    "purchaseNow": "Kup Teraz",
+    "restorePurchase": "Przywróć Zakup",
+    "maybeLater": "Może Później"
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "appearance": "Wygląd",
+    "theme": "Motyw",
+    "language": "Język",
+    "audio": "Dźwięk",
+    "sound": "Dźwięk",
+    "haptics": "Wibracje",
+    "about": "O aplikacji",
+    "version": "Wersja",
+    "selectTheme": "Wybierz Motyw",
+    "selectLanguage": "Wybierz Język"
+  },
+  "themes": {
+    "light": "Jasny",
+    "dark": "Ciemny",
+    "solar": "Słoneczny",
+    "mono": "Mono"
+  },
+  "languages": {
+    "en": "Angielski",
+    "ru": "Rosyjski",
+    "es": "Hiszpański",
+    "de": "Niemiecki",
+    "fr": "Francuski",
+    "pt": "Portugalski",
+    "ja": "Japoński",
+    "it": "Włoski",
+    "pl": "Polski",
+    "zh": "Chiński",
+    "hi": "Hindi",
+    "uk": "Ukraiński"
+  }
+}

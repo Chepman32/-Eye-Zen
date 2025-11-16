@@ -1,0 +1,80 @@
+{
+  "common": {
+    "start": "Começar",
+    "skip": "Pular",
+    "next": "Próximo",
+    "close": "Fechar",
+    "cancel": "Cancelar",
+    "ok": "OK",
+    "save": "Salvar",
+    "done": "Concluído"
+  },
+  "splash": {
+    "title": "Descanso para os Olhos"
+  },
+  "onboarding": {
+    "skip": "Pular",
+    "next": "Próximo",
+    "benefit": "Em vez de uma sessão diária, faça até cinco por dia",
+    "oneTimePayment": "pagamento único",
+    "processing": "Processando...",
+    "unlockPremium": "Desbloquear Premium"
+  },
+  "home": {
+    "start": "Começar"
+  },
+  "premium": {
+    "premiumActive": "⭐ Premium Ativo",
+    "freePlan": "Plano Gratuito",
+    "videosRemaining": "Vídeos restantes hoje",
+    "upgradeToPremium": "⭐ Atualizar para Premium",
+    "watchUpTo5": "Assista até 5 vídeos por dia com premium!"
+  },
+  "purchaseModal": {
+    "title": "Atualizar para Premium",
+    "subtitle": "Assista mais vídeos diariamente",
+    "feature1": "Assista até",
+    "feature1Value": "5 vídeos",
+    "feature1Suffix": "por dia",
+    "feature2": "Compra única",
+    "feature3": "Acesso vitalício",
+    "feature4": "Apoie o desenvolvimento",
+    "oneTimePayment": "Pagamento único",
+    "purchaseNow": "Comprar Agora",
+    "restorePurchase": "Restaurar Compra",
+    "maybeLater": "Talvez Depois"
+  },
+  "settings": {
+    "title": "Configurações",
+    "appearance": "Aparência",
+    "theme": "Tema",
+    "language": "Idioma",
+    "audio": "Áudio",
+    "sound": "Som",
+    "haptics": "Háptica",
+    "about": "Sobre",
+    "version": "Versão",
+    "selectTheme": "Selecionar Tema",
+    "selectLanguage": "Selecionar Idioma"
+  },
+  "themes": {
+    "light": "Claro",
+    "dark": "Escuro",
+    "solar": "Solar",
+    "mono": "Mono"
+  },
+  "languages": {
+    "en": "Inglês",
+    "ru": "Russo",
+    "es": "Espanhol",
+    "de": "Alemão",
+    "fr": "Francês",
+    "pt": "Português",
+    "ja": "Japonês",
+    "it": "Italiano",
+    "pl": "Polonês",
+    "zh": "Chinês",
+    "hi": "Hindi",
+    "uk": "Ucraniano"
+  }
+}

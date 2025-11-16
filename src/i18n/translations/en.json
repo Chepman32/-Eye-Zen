@@ -26,15 +26,15 @@
   "premium": {
     "premiumActive": "⭐ Premium Active",
     "freePlan": "Free Plan",
-    "videosRemaining": "Videos remaining today",
+    "videosRemaining": "Sessions remaining today",
     "upgradeToPremium": "⭐ Upgrade to Premium",
-    "watchUpTo5": "Watch up to 5 videos per day with premium!"
+    "watchUpTo5": "Watch up to 5 sessions per day with premium!"
   },
   "purchaseModal": {
     "title": "Upgrade to Premium",
-    "subtitle": "Watch more videos daily",
+    "subtitle": "Watch more sessions daily",
     "feature1": "Watch up to",
-    "feature1Value": "5 videos",
+    "feature1Value": "5 sessions",
     "feature1Suffix": "per day",
     "feature2": "One-time purchase",
     "feature3": "Lifetime access",

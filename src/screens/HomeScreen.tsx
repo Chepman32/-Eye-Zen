@@ -22,7 +22,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
-const BUTTON_SIZE = Math.min(width, height) * 0.4;
+const BUTTON_SIZE = Math.min(width, height) * 0.6;
 
 const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
   const idleScale = useSharedValue(1);
@@ -95,7 +95,7 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 120 },
   settingsButton: {
     position: 'absolute',
     right: 16,

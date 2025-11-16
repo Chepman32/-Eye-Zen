@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useMemo, useState, useRef, useEffect} from 'react';
 import {
   View,
   Text,
@@ -63,6 +63,17 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
   const [expandedTheme, setExpandedTheme] = useState(false);
   const [expandedLanguage, setExpandedLanguage] = useState(false);
 
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [languageSectionY, setLanguageSectionY] = useState(0);
+
+  useEffect(() => {
+    if (expandedLanguage && scrollViewRef.current && languageSectionY > 0) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollTo({y: languageSectionY - 20, animated: true});
+      }, 100);
+    }
+  }, [expandedLanguage, languageSectionY]);
+
   const handleThemeChange = (newTheme: ThemeName) => {
     triggerHaptic('impactLight');
     setTheme(newTheme);
@@ -118,7 +129,7 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollViewRef} style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Appearance Section */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, {color: theme.colors.textSecondary}]}>
@@ -187,7 +198,12 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
         </View>
 
         {/* Language Section */}
-        <View style={styles.section}>
+        <View
+          style={styles.section}
+          onLayout={(event) => {
+            const {y} = event.nativeEvent.layout;
+            setLanguageSectionY(y);
+          }}>
           <Text style={[styles.sectionTitle, {color: theme.colors.textSecondary}]}>
             {t('settings.language')}
           </Text>

@@ -7,7 +7,6 @@ import {
   Pressable,
   Switch,
   Platform,
-  Modal,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -27,19 +26,19 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
   const {soundEnabled, hapticsEnabled, setSoundEnabled, setHapticsEnabled, triggerHaptic} =
     useSettings();
 
-  const [showThemeSelector, setShowThemeSelector] = useState(false);
-  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
+  const [expandedTheme, setExpandedTheme] = useState(false);
+  const [expandedLanguage, setExpandedLanguage] = useState(false);
 
   const handleThemeChange = (newTheme: ThemeName) => {
     triggerHaptic('impactLight');
     setTheme(newTheme);
-    setShowThemeSelector(false);
+    setExpandedTheme(false);
   };
 
   const handleLanguageChange = async (lang: Language) => {
     triggerHaptic('impactLight');
     await changeLanguage(lang);
-    setShowLanguageSelector(false);
+    setExpandedLanguage(false);
   };
 
   const handleSoundToggle = (value: boolean) => {
@@ -82,26 +81,64 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
           </Text>
 
           {/* Theme */}
-          <Pressable
-            style={[styles.settingItem, {backgroundColor: theme.colors.surface}]}
-            onPress={() => {
-              triggerHaptic('selection');
-              setShowThemeSelector(true);
-            }}
-            android_ripple={{color: theme.colors.primary}}>
-            <View style={styles.settingLeft}>
-              <Icon name="color-palette" size={22} color={theme.colors.primary} />
-              <Text style={[styles.settingLabel, {color: theme.colors.text}]}>
-                {t('settings.theme')}
-              </Text>
-            </View>
-            <View style={styles.settingRight}>
-              <Text style={[styles.settingValue, {color: theme.colors.textSecondary}]}>
-                {t(`themes.${themeName}`)}
-              </Text>
-              <Icon name="chevron-forward" size={20} color={theme.colors.textTertiary} />
-            </View>
-          </Pressable>
+          <View style={[styles.accordionContainer, {backgroundColor: theme.colors.surface}]}>
+            <Pressable
+              style={styles.settingItem}
+              onPress={() => {
+                triggerHaptic('selection');
+                setExpandedTheme(!expandedTheme);
+              }}
+              android_ripple={{color: theme.colors.primary}}>
+              <View style={styles.settingLeft}>
+                <Icon name="color-palette" size={22} color={theme.colors.primary} />
+                <Text style={[styles.settingLabel, {color: theme.colors.text}]}>
+                  {t('settings.theme')}
+                </Text>
+              </View>
+              <View style={styles.settingRight}>
+                <Text style={[styles.settingValue, {color: theme.colors.textSecondary}]}>
+                  {t(`themes.${themeName}`)}
+                </Text>
+                <Icon
+                  name={expandedTheme ? 'chevron-up' : 'chevron-down'}
+                  size={20}
+                  color={theme.colors.textTertiary}
+                />
+              </View>
+            </Pressable>
+
+            {expandedTheme && (
+              <View style={styles.accordionContent}>
+                {(['light', 'dark', 'solar', 'mono'] as ThemeName[]).map(themeOption => (
+                  <Pressable
+                    key={themeOption}
+                    style={[
+                      styles.accordionOption,
+                      themeName === themeOption && {
+                        backgroundColor: theme.colors.backgroundSecondary,
+                      },
+                    ]}
+                    onPress={() => handleThemeChange(themeOption)}
+                    android_ripple={{color: theme.colors.primary}}>
+                    <Text
+                      style={[
+                        styles.accordionOptionText,
+                        {color: theme.colors.text},
+                        themeName === themeOption && {
+                          fontWeight: '700',
+                          color: theme.colors.primary,
+                        },
+                      ]}>
+                      {t(`themes.${themeOption}`)}
+                    </Text>
+                    {themeName === themeOption && (
+                      <Icon name="checkmark" size={22} color={theme.colors.primary} />
+                    )}
+                  </Pressable>
+                ))}
+              </View>
+            )}
+          </View>
         </View>
 
         {/* Language Section */}
@@ -111,26 +148,64 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
           </Text>
 
           {/* Language */}
-          <Pressable
-            style={[styles.settingItem, {backgroundColor: theme.colors.surface}]}
-            onPress={() => {
-              triggerHaptic('selection');
-              setShowLanguageSelector(true);
-            }}
-            android_ripple={{color: theme.colors.primary}}>
-            <View style={styles.settingLeft}>
-              <Icon name="language" size={22} color={theme.colors.primary} />
-              <Text style={[styles.settingLabel, {color: theme.colors.text}]}>
-                {t('settings.language')}
-              </Text>
-            </View>
-            <View style={styles.settingRight}>
-              <Text style={[styles.settingValue, {color: theme.colors.textSecondary}]}>
-                {currentLanguage.nativeName}
-              </Text>
-              <Icon name="chevron-forward" size={20} color={theme.colors.textTertiary} />
-            </View>
-          </Pressable>
+          <View style={[styles.accordionContainer, {backgroundColor: theme.colors.surface}]}>
+            <Pressable
+              style={styles.settingItem}
+              onPress={() => {
+                triggerHaptic('selection');
+                setExpandedLanguage(!expandedLanguage);
+              }}
+              android_ripple={{color: theme.colors.primary}}>
+              <View style={styles.settingLeft}>
+                <Icon name="language" size={22} color={theme.colors.primary} />
+                <Text style={[styles.settingLabel, {color: theme.colors.text}]}>
+                  {t('settings.language')}
+                </Text>
+              </View>
+              <View style={styles.settingRight}>
+                <Text style={[styles.settingValue, {color: theme.colors.textSecondary}]}>
+                  {currentLanguage.nativeName}
+                </Text>
+                <Icon
+                  name={expandedLanguage ? 'chevron-up' : 'chevron-down'}
+                  size={20}
+                  color={theme.colors.textTertiary}
+                />
+              </View>
+            </Pressable>
+
+            {expandedLanguage && (
+              <View style={styles.accordionContent}>
+                {languages.map(lang => (
+                  <Pressable
+                    key={lang.code}
+                    style={[
+                      styles.accordionOption,
+                      i18n.language === lang.code && {
+                        backgroundColor: theme.colors.backgroundSecondary,
+                      },
+                    ]}
+                    onPress={() => handleLanguageChange(lang.code)}
+                    android_ripple={{color: theme.colors.primary}}>
+                    <Text
+                      style={[
+                        styles.accordionOptionText,
+                        {color: theme.colors.text},
+                        i18n.language === lang.code && {
+                          fontWeight: '700',
+                          color: theme.colors.primary,
+                        },
+                      ]}>
+                      {lang.nativeName}
+                    </Text>
+                    {i18n.language === lang.code && (
+                      <Icon name="checkmark" size={22} color={theme.colors.primary} />
+                    )}
+                  </Pressable>
+                ))}
+              </View>
+            )}
+          </View>
         </View>
 
         {/* Audio Section */}
@@ -184,99 +259,6 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
           </View>
         </View>
       </ScrollView>
-
-      {/* Theme Selector Modal */}
-      <Modal
-        visible={showThemeSelector}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowThemeSelector(false)}>
-        <Pressable
-          style={[styles.modalOverlay, {backgroundColor: theme.colors.overlay}]}
-          onPress={() => setShowThemeSelector(false)}>
-          <View
-            style={[
-              styles.modalContent,
-              {backgroundColor: theme.colors.surface, borderColor: theme.colors.border},
-            ]}>
-            <Text style={[styles.modalTitle, {color: theme.colors.text}]}>
-              {t('settings.selectTheme')}
-            </Text>
-            {(['light', 'dark', 'solar', 'mono'] as ThemeName[]).map(themeOption => (
-              <Pressable
-                key={themeOption}
-                style={[
-                  styles.modalOption,
-                  themeName === themeOption && {backgroundColor: theme.colors.backgroundSecondary},
-                ]}
-                onPress={() => handleThemeChange(themeOption)}
-                android_ripple={{color: theme.colors.primary}}>
-                <Text
-                  style={[
-                    styles.modalOptionText,
-                    {color: theme.colors.text},
-                    themeName === themeOption && {fontWeight: '700', color: theme.colors.primary},
-                  ]}>
-                  {t(`themes.${themeOption}`)}
-                </Text>
-                {themeName === themeOption && (
-                  <Icon name="checkmark" size={22} color={theme.colors.primary} />
-                )}
-              </Pressable>
-            ))}
-          </View>
-        </Pressable>
-      </Modal>
-
-      {/* Language Selector Modal */}
-      <Modal
-        visible={showLanguageSelector}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowLanguageSelector(false)}>
-        <Pressable
-          style={[styles.modalOverlay, {backgroundColor: theme.colors.overlay}]}
-          onPress={() => setShowLanguageSelector(false)}>
-          <ScrollView contentContainerStyle={styles.modalScrollContent}>
-            <View
-              style={[
-                styles.modalContent,
-                {backgroundColor: theme.colors.surface, borderColor: theme.colors.border},
-              ]}>
-              <Text style={[styles.modalTitle, {color: theme.colors.text}]}>
-                {t('settings.selectLanguage')}
-              </Text>
-              {languages.map(lang => (
-                <Pressable
-                  key={lang.code}
-                  style={[
-                    styles.modalOption,
-                    i18n.language === lang.code && {
-                      backgroundColor: theme.colors.backgroundSecondary,
-                    },
-                  ]}
-                  onPress={() => handleLanguageChange(lang.code)}
-                  android_ripple={{color: theme.colors.primary}}>
-                  <Text
-                    style={[
-                      styles.modalOptionText,
-                      {color: theme.colors.text},
-                      i18n.language === lang.code && {
-                        fontWeight: '700',
-                        color: theme.colors.primary,
-                      },
-                    ]}>
-                    {lang.nativeName}
-                  </Text>
-                  {i18n.language === lang.code && (
-                    <Icon name="checkmark" size={22} color={theme.colors.primary} />
-                  )}
-                </Pressable>
-              ))}
-            </View>
-          </ScrollView>
-        </Pressable>
-      </Modal>
     </SafeAreaView>
   );
 };
@@ -348,52 +330,24 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginRight: 8,
   },
-  modalOverlay: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+  accordionContainer: {
+    borderRadius: 12,
+    overflow: 'hidden',
   },
-  modalScrollContent: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+  accordionContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
   },
-  modalContent: {
-    width: '100%',
-    maxWidth: 400,
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 1,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 4},
-        shadowOpacity: 0.2,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  modalOption: {
+  accordionOption: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 14,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     marginBottom: 4,
   },
-  modalOptionText: {
+  accordionOptionText: {
     fontSize: 16,
   },
 });

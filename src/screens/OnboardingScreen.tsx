@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -25,38 +25,116 @@ interface OnboardingSlide {
   isPaywall?: boolean;
 }
 
-const slides: OnboardingSlide[] = [
-  {
-    id: '1',
-    image: require('../assets/onboarding/onboarding_en_1.png'),
+// Map of all available onboarding images by language
+const onboardingImages: Record<string, {
+  slide1: any;
+  slide2: any;
+  slide3: any;
+  slide4: any;
+  paywall: any;
+}> = {
+  en: {
+    slide1: require('../assets/onboarding/onboarding_en_1.png'),
+    slide2: require('../assets/onboarding/onboarding_en_2.png'),
+    slide3: require('../assets/onboarding/onboarding_en_3.png'),
+    slide4: require('../assets/onboarding/onboarding_en_4.png'),
+    paywall: require('../assets/onboarding/onboarding_en_paywall.png'),
   },
-  {
-    id: '2',
-    image: require('../assets/onboarding/onboarding_en_2.png'),
+  fr: {
+    slide1: require('../assets/onboarding/fr/onboarding_fr_1.png'),
+    slide2: require('../assets/onboarding/fr/onboarding_fr_2.png'),
+    slide3: require('../assets/onboarding/fr/onboarding_fr_3.png'),
+    slide4: require('../assets/onboarding/fr/onboarding_fr_4.png'),
+    paywall: require('../assets/onboarding/fr/onboarding_fr_paywall.png'),
   },
-  {
-    id: '3',
-    image: require('../assets/onboarding/onboarding_en_3.png'),
+  de: {
+    slide1: require('../assets/onboarding/ge/onboarding_ge_1.png'),
+    slide2: require('../assets/onboarding/ge/onboarding_ge_2.png'),
+    slide3: require('../assets/onboarding/ge/onboarding_ge_3.png'),
+    slide4: require('../assets/onboarding/ge/onboarding_ge_4.png'),
+    paywall: require('../assets/onboarding/ge/onboarding_ge_paywall.png'),
   },
-  {
-    id: '4',
-    image: require('../assets/onboarding/onboarding_en_4.png'),
+  it: {
+    slide1: require('../assets/onboarding/it/onboarding_it_1.png'),
+    slide2: require('../assets/onboarding/it/onboarding_it_2.png'),
+    slide3: require('../assets/onboarding/it/onboarding_it_3.png'),
+    slide4: require('../assets/onboarding/it/onboarding_it_4.png'),
+    paywall: require('../assets/onboarding/it/onboarding_it_paywall.png'),
   },
-  {
-    id: '5',
-    image: require('../assets/onboarding/onboarding_en_paywall.png'),
-    isPaywall: true,
+  ja: {
+    slide1: require('../assets/onboarding/ja/onboarding_ja_1.png'),
+    slide2: require('../assets/onboarding/ja/onboarding_ja_2.png'),
+    slide3: require('../assets/onboarding/ja/onboarding_ja_3.png'),
+    slide4: require('../assets/onboarding/ja/onboarding_ja_4.png'),
+    paywall: require('../assets/onboarding/ja/onboarding_ja_paywall.png'),
   },
-];
+  ko: {
+    slide1: require('../assets/onboarding/ko/onboarding_ko_1.png'),
+    slide2: require('../assets/onboarding/ko/onboarding_ko_2.png'),
+    slide3: require('../assets/onboarding/ko/onboarding_ko_3.png'),
+    slide4: require('../assets/onboarding/ko/onboarding_ko_4.png'),
+    paywall: require('../assets/onboarding/ko/onboarding_ko_paywall.png'),
+  },
+  pl: {
+    slide1: require('../assets/onboarding/pl/onboarding_pl_1.png'),
+    slide2: require('../assets/onboarding/pl/onboarding_pl_2.png'),
+    slide3: require('../assets/onboarding/pl/onboarding_pl_3.png'),
+    slide4: require('../assets/onboarding/pl/onboarding_pl_4.png'),
+    paywall: require('../assets/onboarding/pl/onboarding_pl_paywall.png'),
+  },
+  pt: {
+    slide1: require('../assets/onboarding/pt/onboarding_pt_1.png'),
+    slide2: require('../assets/onboarding/pt/onboarding_pt_2.png'),
+    slide3: require('../assets/onboarding/pt/onboarding_pt_3.png'),
+    slide4: require('../assets/onboarding/pt/onboarding_pt_4.png'),
+    paywall: require('../assets/onboarding/pt/onboarding_pt_paywall.png'),
+  },
+};
+
+// Helper function to get slides for a specific language with fallback to English
+const getSlidesForLanguage = (language: string): OnboardingSlide[] => {
+  // Extract base language code (e.g., 'en' from 'en-US')
+  const langCode = language.split('-')[0].toLowerCase();
+
+  // Check if we have slides for this language, otherwise use English
+  const images = onboardingImages[langCode] || onboardingImages.en;
+
+  return [
+    {
+      id: '1',
+      image: images.slide1,
+    },
+    {
+      id: '2',
+      image: images.slide2,
+    },
+    {
+      id: '3',
+      image: images.slide3,
+    },
+    {
+      id: '4',
+      image: images.slide4,
+    },
+    {
+      id: '5',
+      image: images.paywall,
+      isPaywall: true,
+    },
+  ];
+};
 
 const OnboardingScreen: React.FC<
   NativeStackScreenProps<RootStackParamList, 'Onboarding'>
 > = ({ navigation }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const { products, purchase, isLoading } = usePurchase();
+
+  // Get slides based on current language with fallback to English
+  const slides = useMemo(() => getSlidesForLanguage(i18n.language), [i18n.language]);
 
   const onViewableItemsChanged = useRef(
     ({

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { useVideoLimit } from '../hooks/useVideoLimit';
 import { PurchaseModal } from './PurchaseModal';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 type PremiumStatusProps = {
   topOffset?: number;
@@ -22,6 +23,10 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({ topOffset = 60 }) 
   } = useVideoLimit();
 
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+
+  const upgradeCopy = t('premium.upgradeToPremium')
+    .replace(/[\u2B50\uFE0F]/g, '')
+    .trim();
 
   const handleUpgradePress = () => {
     Haptic.trigger('impactLight', { enableVibrateFallback: true });
@@ -88,9 +93,17 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({ topOffset = 60 }) 
               <LinearGradient
                 colors={[theme.colors.gradientStart, theme.colors.gradientEnd]}
                 style={styles.upgradeButton}>
-                <Text style={[styles.upgradeButtonText, { color: theme.colors.buttonText }]}>
-                  {t('premium.upgradeToPremium')}
-                </Text>
+                <View style={styles.upgradeButtonContent}>
+                  <Icon
+                    name="star"
+                    size={18}
+                    color={theme.colors.buttonText}
+                    style={styles.upgradeButtonIcon}
+                  />
+                  <Text style={[styles.upgradeButtonText, { color: theme.colors.buttonText }]}>
+                    {upgradeCopy}
+                  </Text>
+                </View>
               </LinearGradient>
             </Pressable>
           )}
@@ -172,14 +185,24 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   upgradeButton: {
-    paddingVertical: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  upgradeButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  upgradeButtonIcon: {
+    marginRight: 8,
+  },
   upgradeButtonText: {
     fontSize: 16,
     fontWeight: '700',
+    lineHeight: 22,
+    textAlign: 'center',
   },
   benefitText: {
     fontSize: 13,

@@ -19,6 +19,7 @@ import {
   enableScreenSecurity,
   disableScreenSecurity,
 } from '../utils/screenSecurity';
+import { useReviewPrompt } from '../hooks/useReviewPrompt';
 
 const source = require('../../assets/video/video.mp4');
 
@@ -36,6 +37,14 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
     incrementWatchCount,
     isLoading,
   } = usePurchase();
+  const { recordPositiveEvent } = useReviewPrompt();
+  const restoreOrientation = useCallback(() => {
+    if (Platform.OS === 'ios' && Platform.isPad) {
+      Orientation.unlockAllOrientations();
+    } else {
+      Orientation.lockToPortrait();
+    }
+  }, []);
 
   const videoOpacity = useSharedValue(0);
   const controlsOffset = useSharedValue(40);
@@ -47,10 +56,10 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
       Orientation.lockToLandscape();
       enableScreenSecurity();
       return () => {
-        Orientation.lockToPortrait();
+        restoreOrientation();
         disableScreenSecurity();
       };
-    }, [])
+    }, [restoreOrientation])
   );
 
   // Animate controls on mount
@@ -95,12 +104,15 @@ const VideoScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Video'>>
     videoOpacity.value = withTiming(0, { duration: 250 });
     controlsOffset.value = withTiming(40, { duration: 200 });
     closeOffset.value = withTiming(-40, { duration: 200 });
-    // Proactively return to portrait
-    Orientation.lockToPortrait();
+    if (hasIncrementedView) {
+      void recordPositiveEvent('session');
+    }
+    // Proactively return to portrait / unlocked tablet layout
+    restoreOrientation();
     setTimeout(() => {
       navigation.goBack();
       // Ensure rotation after navigation completes
-      setTimeout(() => Orientation.lockToPortrait(), 120);
+      setTimeout(() => restoreOrientation(), 120);
     }, 220);
   };
 

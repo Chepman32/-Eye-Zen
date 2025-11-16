@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -31,6 +32,7 @@ export type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const defaultOrientation = Platform.OS === 'ios' && Platform.isPad ? 'all' : 'portrait';
 
 function App() {
   return (
@@ -46,11 +48,11 @@ function App() {
             >
               <Stack.Navigator
                 initialRouteName="Splash"
-                screenOptions={{ headerShown: false, animation: 'fade', orientation: 'portrait' }}
+                screenOptions={{ headerShown: false, animation: 'fade', orientation: defaultOrientation }}
               >
-                <Stack.Screen name="Splash" component={SplashScreen} options={{ orientation: 'portrait' }} />
-                <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ orientation: 'portrait' }} />
-                <Stack.Screen name="Home" component={HomeScreen} options={{ orientation: 'portrait' }} />
+                <Stack.Screen name="Splash" component={SplashScreen} options={{ orientation: defaultOrientation }} />
+                <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ orientation: defaultOrientation }} />
+                <Stack.Screen name="Home" component={HomeScreen} options={{ orientation: defaultOrientation }} />
                 <Stack.Screen
                   name="Video"
                   component={VideoScreen}
@@ -64,7 +66,7 @@ function App() {
                   component={SettingsScreen}
                   options={{
                     animation: 'slide_from_right',
-                    orientation: 'portrait',
+                    orientation: defaultOrientation,
                   }}
                 />
               </Stack.Navigator>

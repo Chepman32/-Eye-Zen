@@ -276,7 +276,7 @@ Before submitting to the App Store:
 - [ ] Tested purchase flow with sandbox account
 - [ ] Tested restore purchase functionality
 - [ ] Tested daily limit reset logic
-- [ ] Added privacy policy (required by Apple for apps with purchases)
+- [x] Added privacy policy (see `../PRIVACY_POLICY.md`, required by Apple for apps with purchases)
 - [ ] Completed App Store listing with screenshots
 - [ ] Set up tax and banking information in App Store Connect
 - [ ] Reviewed App Store guidelines for in-app purchases

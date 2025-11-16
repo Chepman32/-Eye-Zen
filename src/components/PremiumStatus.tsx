@@ -7,9 +7,13 @@ import { useVideoLimit } from '../hooks/useVideoLimit';
 
 type PremiumStatusProps = {
   topOffset?: number;
+  variant?: 'floating' | 'inline';
 };
 
-export const PremiumStatus: React.FC<PremiumStatusProps> = ({ topOffset = 60 }) => {
+export const PremiumStatus: React.FC<PremiumStatusProps> = ({
+  topOffset = 60,
+  variant = 'floating',
+}) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const {
@@ -19,9 +23,14 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({ topOffset = 60 }) 
     canWatchVideo,
   } = useVideoLimit();
 
+  const containerStyles = [
+    styles.container,
+    variant === 'floating' ? [styles.floating, { top: topOffset }] : styles.inline,
+  ];
+
   return (
     <>
-      <View style={[styles.container, { top: topOffset }]}>
+      <View style={containerStyles}>
         {/* Status Card */}
         <View style={[styles.card, { backgroundColor: theme.colors.card }]}>
           <View style={styles.header}>
@@ -74,10 +83,19 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({ topOffset = 60 }) 
 
 const styles = StyleSheet.create({
   container: {
+    overflow: 'visible',
+  },
+  floating: {
     position: 'absolute',
     left: 20,
     right: 20,
-    overflow: 'visible',
+  },
+  inline: {
+    position: 'relative',
+    left: undefined,
+    right: undefined,
+    width: '100%',
+    marginBottom: 24,
   },
   card: {
     borderRadius: 16,

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, Pressable } from 'react-native';
+import React, { useEffect, useMemo } from 'react';
+import { View, Text, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Haptic from 'react-native-haptic-feedback';
 import Animated, {
@@ -22,9 +22,6 @@ import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const { width, height } = Dimensions.get('window');
-const BUTTON_SIZE = Math.min(width, height) * 0.6;
-
 const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
   const idleScale = useSharedValue(1);
   const { theme } = useTheme();
@@ -32,13 +29,52 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const safeTopSpacing = Math.max(insets.top, 12);
+  const { width, height } = useWindowDimensions();
+  const isTabletLayout = width >= 768;
+  const buttonSize = useMemo(() => {
+    const base = Math.min(width, height) * (isTabletLayout ? 0.4 : 0.6);
+    return Math.max(220, Math.min(base, 420));
+  }, [height, width, isTabletLayout]);
+  const buttonWrapperStyle = useMemo(
+    () => ({
+      width: buttonSize,
+      height: buttonSize,
+      borderRadius: buttonSize / 2,
+      shadowColor: '#4CAF50',
+      shadowOpacity: 0.35,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 6,
+    }),
+    [buttonSize]
+  );
+  const circleStyle = useMemo(
+    () => ({
+      width: '100%',
+      height: '100%',
+      borderRadius: buttonSize / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+    }),
+    [buttonSize]
+  );
 
-  // Ensure portrait when returning from Video
+  // Ensure portrait on phones, allow free rotation on tablets
   useFocusEffect(
     React.useCallback(() => {
-      Orientation.lockToPortrait();
-      return undefined;
-    }, [])
+      if (isTabletLayout) {
+        Orientation.unlockAllOrientations();
+      } else {
+        Orientation.lockToPortrait();
+      }
+      return () => {
+        if (isTabletLayout) {
+          Orientation.unlockAllOrientations();
+        } else {
+          Orientation.lockToPortrait();
+        }
+      };
+    }, [isTabletLayout])
   );
 
   useEffect(() => {
@@ -74,7 +110,12 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]} edges={['top', 'bottom']}>
-      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: theme.colors.background },
+          isTabletLayout && styles.tabletContainer,
+        ]}>
         {/* Settings Button */}
         <Pressable
           onPress={onSettings}
@@ -86,14 +127,39 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
           <Icon name="settings-outline" size={24} color={theme.colors.text} />
         </Pressable>
 
-        <PremiumStatus topOffset={safeTopSpacing + 12} />
-        <Animated.View style={[styles.buttonWrap, buttonStyle]}>
-          <Pressable onPress={onStart} style={styles.circle} android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}>
-            <LinearGradient colors={[theme.colors.gradientStart, theme.colors.gradientEnd]} style={styles.circle}>
-              <Text style={[styles.startText, { color: theme.colors.textInverse }]}>{t('home.start')}</Text>
-            </LinearGradient>
-          </Pressable>
-        </Animated.View>
+        {isTabletLayout ? (
+          <View style={styles.tabletContent}>
+            <View style={styles.tabletStatusColumn}>
+              <PremiumStatus variant="inline" />
+            </View>
+            <View style={styles.tabletButtonColumn}>
+              <Animated.View style={[buttonWrapperStyle, buttonStyle]}>
+                <Pressable
+                  onPress={onStart}
+                  style={circleStyle}
+                  android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}>
+                  <LinearGradient colors={[theme.colors.gradientStart, theme.colors.gradientEnd]} style={circleStyle}>
+                    <Text style={[styles.startText, { color: theme.colors.textInverse }]}>{t('home.start')}</Text>
+                  </LinearGradient>
+                </Pressable>
+              </Animated.View>
+            </View>
+          </View>
+        ) : (
+          <>
+            <PremiumStatus topOffset={safeTopSpacing + 12} />
+            <Animated.View style={[buttonWrapperStyle, buttonStyle]}>
+              <Pressable
+                onPress={onStart}
+                style={circleStyle}
+                android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}>
+                <LinearGradient colors={[theme.colors.gradientStart, theme.colors.gradientEnd]} style={circleStyle}>
+                  <Text style={[styles.startText, { color: theme.colors.textInverse }]}>{t('home.start')}</Text>
+                </LinearGradient>
+              </Pressable>
+            </Animated.View>
+          </>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -102,6 +168,10 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   container: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 120 },
+  tabletContainer: {
+    justifyContent: 'center',
+    paddingBottom: 0,
+  },
   settingsButton: {
     position: 'absolute',
     right: 16,
@@ -117,8 +187,21 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 1000,
   },
-  buttonWrap: { width: BUTTON_SIZE, height: BUTTON_SIZE, borderRadius: BUTTON_SIZE / 2, shadowColor: '#4CAF50', shadowOpacity: 0.35, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 6 },
-  circle: { width: '100%', height: '100%', borderRadius: BUTTON_SIZE / 2, alignItems: 'center', justifyContent: 'center' },
+  tabletContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 32,
+    justifyContent: 'space-between',
+  },
+  tabletStatusColumn: {
+    flex: 1,
+    maxWidth: 460,
+  },
+  tabletButtonColumn: {
+    flex: 1,
+    alignItems: 'center',
+  },
   startText: { fontSize: 28, fontWeight: '700' },
 });
 

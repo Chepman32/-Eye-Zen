@@ -50,6 +50,8 @@ npm run android
 - `src/screens/HomeScreen.tsx` — large breathing Start button, haptic on press, navigates to Video
 - `src/screens/VideoScreen.tsx` — fullscreen `react-native-video` using local asset, Play/Pause (bottom-left) and Close (top-right)
 - `assets/video/video.mp4` — bundled offline video
+- `PRIVACY_POLICY.md` — App Store guideline 5.1 compliance statement
+- `docs/` — marketing + store asset playbooks driven by Viktor Seraleev’s strategy threads
 
 ## Tech
 
@@ -59,6 +61,7 @@ npm run android
 - React Native Reanimated 3
 - react-native-video
 - react-native-linear-gradient, react-native-vector-icons, react-native-haptic-feedback
+- react-native-in-app-review
 
 ## Troubleshooting
 
@@ -77,3 +80,4 @@ npm run android
 - Haptic feedback requires a physical device.
 - Vector icons are auto-linked; no manual font config required on RN 0.81.
 - Animations use Reanimated worklets; make sure the plugin is the last in `babel.config.js` and that `react-native-reanimated` is imported in `index.js`.
+- For marketing, ASO, and compliance procedures see `docs/MARKETING_PLAYBOOK.md`, `docs/STORE_ASSET_PLAN.md`, and `PRIVACY_POLICY.md`.

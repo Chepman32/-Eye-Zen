@@ -25,6 +25,7 @@ import {
   getLastWatchDate,
   resetDailyWatchCount,
 } from '../services/storageService';
+import { useReviewPrompt } from '../hooks/useReviewPrompt';
 
 // Video limits
 const FREE_DAILY_LIMIT = 1;
@@ -74,6 +75,7 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [dailyWatchCount, setDailyWatchCountState] = useState(0);
   const [products, setProducts] = useState<IAPProduct[]>([]);
+  const { recordPositiveEvent } = useReviewPrompt();
 
   // Calculate max daily limit based on premium status
   const maxDailyLimit = isPremium ? PREMIUM_DAILY_LIMIT : FREE_DAILY_LIMIT;
@@ -172,7 +174,8 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
       `You can now watch up to ${PREMIUM_DAILY_LIMIT} videos per day!`,
       [{ text: 'Great!' }]
     );
-  }, []);
+    void recordPositiveEvent('purchase');
+  }, [recordPositiveEvent]);
 
   /**
    * Handle purchase error

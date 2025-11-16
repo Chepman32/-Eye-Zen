@@ -17,6 +17,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import Orientation from 'react-native-orientation-locker';
 import { PremiumStatus } from '../components/PremiumStatus';
 import { useTheme } from '../contexts/ThemeContext';
+import { useSettings } from '../contexts/SettingsContext';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -27,6 +28,7 @@ const BUTTON_SIZE = Math.min(width, height) * 0.6;
 const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
   const idleScale = useSharedValue(1);
   const { theme } = useTheme();
+  const { hapticsEnabled } = useSettings();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const safeTopSpacing = Math.max(insets.top, 12);
@@ -53,7 +55,9 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
   const buttonStyle = useAnimatedStyle(() => ({ transform: [{ scale: idleScale.value }] }));
 
   const onStart = () => {
-    Haptic.trigger('impactMedium', { enableVibrateFallback: true });
+    if (hapticsEnabled) {
+      Haptic.trigger('impactLight', { enableVibrateFallback: true });
+    }
     idleScale.value = withSequence(
       withSpring(1.1, { damping: 10, stiffness: 150 }),
       withSpring(1)
@@ -62,7 +66,9 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
   };
 
   const onSettings = () => {
-    Haptic.trigger('impactLight', { enableVibrateFallback: true });
+    if (hapticsEnabled) {
+      Haptic.trigger('impactLight', { enableVibrateFallback: true });
+    }
     navigation.navigate('Settings');
   };
 

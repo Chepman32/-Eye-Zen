@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,40 @@ import {ThemeName} from '../theme/themes';
 import {changeLanguage, Language, languages} from '../i18n/i18n';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
+
+const SWITCH_TRACK_OFF = '#D1D5DB';
+const SWITCH_THUMB_OFF = '#FFFFFF';
+const ACTIVE_TRACK_ALPHA = 0.35;
+
+const applyOpacity = (color: string, alpha: number) => {
+  if (!color.startsWith('#')) {
+    return color;
+  }
+
+  let hex = color.replace('#', '');
+
+  if (hex.length === 3) {
+    hex = hex
+      .split('')
+      .map(char => char + char)
+      .join('');
+  }
+
+  if (hex.length === 8) {
+    hex = hex.substring(0, 6);
+  }
+
+  if (hex.length !== 6) {
+    return color;
+  }
+
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  const normalizedAlpha = Math.min(1, Math.max(0, alpha));
+
+  return `rgba(${r}, ${g}, ${b}, ${normalizedAlpha})`;
+};
 
 const SettingsScreen: React.FC<Props> = ({navigation}) => {
   const {t, i18n} = useTranslation();
@@ -54,6 +88,17 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
   };
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+
+  const switchTrackColors = useMemo(
+    () => ({
+      false: SWITCH_TRACK_OFF,
+      true: applyOpacity(theme.colors.primary, ACTIVE_TRACK_ALPHA),
+    }),
+    [theme.colors.primary],
+  );
+
+  const getThumbColor = (enabled: boolean) =>
+    enabled ? theme.colors.primaryDark : SWITCH_THUMB_OFF;
 
   return (
     <SafeAreaView
@@ -229,12 +274,9 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
             <Switch
               value={soundEnabled}
               onValueChange={handleSoundToggle}
-              trackColor={{
-                false: theme.colors.border,
-                true: theme.colors.primaryLight,
-              }}
-              thumbColor={soundEnabled ? theme.colors.primary : theme.colors.textTertiary}
-              ios_backgroundColor={theme.colors.border}
+              trackColor={switchTrackColors}
+              thumbColor={getThumbColor(soundEnabled)}
+              ios_backgroundColor={SWITCH_TRACK_OFF}
             />
           </View>
 
@@ -249,12 +291,9 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
             <Switch
               value={hapticsEnabled}
               onValueChange={handleHapticsToggle}
-              trackColor={{
-                false: theme.colors.border,
-                true: theme.colors.primaryLight,
-              }}
-              thumbColor={hapticsEnabled ? theme.colors.primary : theme.colors.textTertiary}
-              ios_backgroundColor={theme.colors.border}
+              trackColor={switchTrackColors}
+              thumbColor={getThumbColor(hapticsEnabled)}
+              ios_backgroundColor={SWITCH_TRACK_OFF}
             />
           </View>
         </View>

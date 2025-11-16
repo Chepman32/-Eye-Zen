@@ -9,6 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -17,6 +18,7 @@ import {useTheme} from '../contexts/ThemeContext';
 import {useSettings} from '../contexts/SettingsContext';
 import {ThemeName} from '../theme/themes';
 import {changeLanguage, Language, languages} from '../i18n/i18n';
+import {PurchaseModal} from '../components/PurchaseModal';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
@@ -62,6 +64,7 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
 
   const [expandedTheme, setExpandedTheme] = useState(false);
   const [expandedLanguage, setExpandedLanguage] = useState(false);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
   const scrollViewRef = useRef<ScrollView>(null);
   const [languageSectionY, setLanguageSectionY] = useState(0);
@@ -96,6 +99,11 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
     if (value) {
       triggerHaptic('selection');
     }
+  };
+
+  const handleUpgradePress = () => {
+    triggerHaptic('impactLight');
+    setShowPurchaseModal(true);
   };
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
@@ -313,7 +321,47 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
             />
           </View>
         </View>
+
+        {/* Upgrade Section */}
+        <View style={styles.section}>
+          <Pressable
+            onPress={handleUpgradePress}
+            style={styles.upgradeBannerWrapper}
+            android_ripple={{
+              color: 'rgba(255,255,255,0.1)',
+              borderless: false,
+            }}>
+            <LinearGradient
+              colors={[theme.colors.gradientStart, theme.colors.gradientEnd]}
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 1}}
+              style={styles.upgradeBanner}>
+              <View style={styles.upgradeBannerContent}>
+                <Icon
+                  name="star"
+                  size={40}
+                  color={theme.colors.buttonText}
+                  style={styles.upgradeBannerIcon}
+                />
+                <View style={styles.upgradeBannerTextContainer}>
+                  <Text style={[styles.upgradeBannerTitle, {color: theme.colors.buttonText}]}>
+                    {t('settings.premium')}
+                  </Text>
+                  <Text style={[styles.upgradeBannerSubtitle, {color: theme.colors.buttonText}]}>
+                    {t('settings.upgradeTier')}
+                  </Text>
+                </View>
+              </View>
+            </LinearGradient>
+          </Pressable>
+        </View>
       </ScrollView>
+
+      {/* Purchase Modal */}
+      <PurchaseModal
+        visible={showPurchaseModal}
+        onClose={() => setShowPurchaseModal(false)}
+      />
     </SafeAreaView>
   );
 };
@@ -404,6 +452,42 @@ const styles = StyleSheet.create({
   },
   accordionOptionText: {
     fontSize: 16,
+  },
+  upgradeBannerWrapper: {
+    borderRadius: 28,
+    overflow: 'visible',
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    shadowOffset: {width: 0, height: 6},
+    elevation: 7,
+  },
+  upgradeBanner: {
+    borderRadius: 28,
+    minHeight: 100,
+  },
+  upgradeBannerContent: {
+    paddingTop: 24,
+    paddingBottom: 16,
+    paddingHorizontal: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  upgradeBannerIcon: {
+    marginRight: 20,
+  },
+  upgradeBannerTextContainer: {
+    flex: 1,
+  },
+  upgradeBannerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  upgradeBannerSubtitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    opacity: 0.92,
   },
 });
 

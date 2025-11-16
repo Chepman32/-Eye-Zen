@@ -52,6 +52,8 @@
     "audio": "Audio",
     "sound": "Sound",
     "haptics": "Haptics",
+    "premium": "Premium",
+    "upgradeTier": "Upgrade your tier",
     "about": "About",
     "version": "Version",
     "selectTheme": "Select Theme",

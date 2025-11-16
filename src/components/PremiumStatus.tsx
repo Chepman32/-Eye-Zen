@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Haptic from 'react-native-haptic-feedback';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { useVideoLimit } from '../hooks/useVideoLimit';
-import { PurchaseModal } from './PurchaseModal';
-import Icon from 'react-native-vector-icons/Ionicons';
 
 type PremiumStatusProps = {
   topOffset?: number;
@@ -21,17 +18,6 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({ topOffset = 60 }) 
     maxDailyLimit,
     canWatchVideo,
   } = useVideoLimit();
-
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
-
-  const upgradeCopy = t('premium.upgradeToPremium')
-    .replace(/[\u2B50\uFE0F]/g, '')
-    .trim();
-
-  const handleUpgradePress = () => {
-    Haptic.trigger('impactLight', { enableVibrateFallback: true });
-    setShowPurchaseModal(true);
-  };
 
   return (
     <>
@@ -80,48 +66,8 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({ topOffset = 60 }) 
               />
             </View>
           </View>
-
-          {/* Upgrade Button (only for free users) */}
-          {!isPremium && (
-            <Pressable
-              onPress={handleUpgradePress}
-              style={styles.upgradeButtonWrapper}
-              android_ripple={{
-                color: 'rgba(255,255,255,0.3)',
-                borderless: false,
-              }}>
-              <LinearGradient
-                colors={[theme.colors.gradientStart, theme.colors.gradientEnd]}
-                style={styles.upgradeButton}>
-                <View style={styles.upgradeButtonContent}>
-                  <Icon
-                    name="star"
-                    size={18}
-                    color={theme.colors.buttonText}
-                    style={styles.upgradeButtonIcon}
-                  />
-                  <Text style={[styles.upgradeButtonText, { color: theme.colors.buttonText }]}>
-                    {upgradeCopy}
-                  </Text>
-                </View>
-              </LinearGradient>
-            </Pressable>
-          )}
-
-          {/* Premium Benefits (only for free users) */}
-          {!isPremium && (
-            <Text style={[styles.benefitText, { color: theme.colors.textTertiary }]}>
-              {t('premium.watchUpTo5')}
-            </Text>
-          )}
         </View>
       </View>
-
-      {/* Purchase Modal */}
-      <PurchaseModal
-        visible={showPurchaseModal}
-        onClose={() => setShowPurchaseModal(false)}
-      />
     </>
   );
 };
@@ -131,10 +77,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 20,
     right: 20,
+    overflow: 'visible',
   },
   card: {
     borderRadius: 16,
-    padding: 20,
+    padding: 24,
+    minHeight: 170,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 12,
@@ -142,14 +90,14 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   header: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
   },
   countContainer: {
-    marginBottom: 12,
+    marginBottom: 16,
   },
   countLabel: {
     fontSize: 14,
@@ -160,52 +108,23 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   countNumber: {
-    fontSize: 36,
+    fontSize: 42,
     fontWeight: '700',
   },
   countTotal: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '600',
   },
   progressBarContainer: {
     marginBottom: 16,
   },
   progressBarBackground: {
-    height: 8,
+    height: 10,
     borderRadius: 4,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
     borderRadius: 4,
-  },
-  upgradeButtonWrapper: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 12,
-  },
-  upgradeButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  upgradeButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  upgradeButtonIcon: {
-    marginRight: 8,
-  },
-  upgradeButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 22,
-    textAlign: 'center',
-  },
-  benefitText: {
-    fontSize: 13,
-    textAlign: 'center',
   },
 });

@@ -233,7 +233,7 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
               </View>
               <View style={styles.settingRight}>
                 <Text style={[styles.settingValue, {color: theme.colors.textSecondary}]}>
-                  {currentLanguage.nativeName}
+                  {currentLanguage.flag} {currentLanguage.nativeName}
                 </Text>
                 <Icon
                   name={expandedLanguage ? 'chevron-up' : 'chevron-down'}
@@ -265,7 +265,7 @@ const SettingsScreen: React.FC<Props> = ({navigation}) => {
                           color: theme.colors.primary,
                         },
                       ]}>
-                      {lang.nativeName}
+                      {lang.flag} {lang.nativeName}
                     </Text>
                     {i18n.language === lang.code && (
                       <Icon name="checkmark" size={22} color={theme.colors.primary} />

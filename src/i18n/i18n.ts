@@ -34,19 +34,19 @@ export const resources = {
 
 export type Language = keyof typeof resources;
 
-export const languages: {code: Language; name: string; nativeName: string}[] = [
-  {code: 'en', name: 'English', nativeName: 'English'},
-  {code: 'ru', name: 'Russian', nativeName: 'Русский'},
-  {code: 'es', name: 'Spanish', nativeName: 'Español'},
-  {code: 'de', name: 'German', nativeName: 'Deutsch'},
-  {code: 'fr', name: 'French', nativeName: 'Français'},
-  {code: 'pt', name: 'Portuguese', nativeName: 'Português'},
-  {code: 'ja', name: 'Japanese', nativeName: '日本語'},
-  {code: 'it', name: 'Italian', nativeName: 'Italiano'},
-  {code: 'pl', name: 'Polish', nativeName: 'Polski'},
-  {code: 'zh', name: 'Chinese', nativeName: '中文'},
-  {code: 'hi', name: 'Hindi', nativeName: 'हिन्दी'},
-  {code: 'uk', name: 'Ukrainian', nativeName: 'Українська'},
+export const languages: {code: Language; name: string; nativeName: string; flag: string}[] = [
+  {code: 'en', name: 'English', nativeName: 'English', flag: '🇬🇧'},
+  {code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸'},
+  {code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪'},
+  {code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷'},
+  {code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇵🇹'},
+  {code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺'},
+  {code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '🇯🇵'},
+  {code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹'},
+  {code: 'pl', name: 'Polish', nativeName: 'Polski', flag: '🇵🇱'},
+  {code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳'},
+  {code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳'},
+  {code: 'uk', name: 'Ukrainian', nativeName: 'Українська', flag: '🇺🇦'},
 ];
 
 const FALLBACK_LANGUAGE: Language = 'en';

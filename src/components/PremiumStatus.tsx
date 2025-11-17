@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, type DimensionValue } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
@@ -21,12 +21,20 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({
     remainingVideos,
     maxDailyLimit,
     canWatchVideo,
+    isUnlimited,
   } = useVideoLimit();
 
   const containerStyles = [
     styles.container,
     variant === 'floating' ? [styles.floating, { top: topOffset }] : styles.inline,
   ];
+
+  const remainingLabel = isUnlimited ? '∞' : remainingVideos;
+  const totalLabel = isUnlimited ? t('premium.unlimitedLabel') : `${maxDailyLimit}`;
+  const progressWidth: DimensionValue =
+    isUnlimited || maxDailyLimit === 0
+      ? '100%'
+      : `${Math.min(100, (remainingVideos / maxDailyLimit) * 100)}%`;
 
   return (
     <>
@@ -51,10 +59,10 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({
                   { color: theme.colors.success },
                   !canWatchVideo && { color: theme.colors.error },
                 ]}>
-                {remainingVideos}
+                {remainingLabel}
               </Text>
               <Text style={[styles.countTotal, { color: theme.colors.textTertiary }]}>
-                {' / '}{maxDailyLimit}
+                {' / '}{totalLabel}
               </Text>
             </View>
           </View>
@@ -69,7 +77,7 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({
                 style={[
                   styles.progressBarFill,
                   {
-                    width: `${(remainingVideos / maxDailyLimit) * 100}%`,
+                    width: progressWidth,
                   },
                 ]}
               />

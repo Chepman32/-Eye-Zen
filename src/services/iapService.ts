@@ -1,5 +1,6 @@
 import { Platform, NativeModules } from 'react-native';
-import { setIsPremium } from './storageService';
+import { setIsPremium, setPremiumPlan } from './storageService';
+import type { PremiumPlan } from '../types/premium';
 
 // Conditional imports to avoid crashes when IAP is not available
 let initConnection: any;
@@ -37,11 +38,30 @@ export type { PurchaseError, Product, Purchase } from 'react-native-iap';
 
 // Product IDs - MUST match exactly what you create in App Store Connect
 export const PRODUCT_IDS = {
-  PREMIUM_VIDEOS: 'com.eyeszen.antonchepur.app.dailyfive', // iOS product ID
+  PREMIUM_VIDEOS: 'com.eyeszen.antonchepur.app.dailyfive', // iOS product ID (lifetime)
+  YEARLY_UNLIMITED: 'com.eyeszen.antonchepur.app.yearlyunlimited', // subscription
 } as const;
 
+export type ProductId = (typeof PRODUCT_IDS)[keyof typeof PRODUCT_IDS];
+
+// Map product IDs to internal plan types
+const PRODUCT_PLAN_MAP: Record<ProductId, PremiumPlan> = {
+  [PRODUCT_IDS.PREMIUM_VIDEOS]: 'lifetime',
+  [PRODUCT_IDS.YEARLY_UNLIMITED]: 'yearly',
+};
+
 // iOS product IDs array
-const IOS_PRODUCT_IDS = [PRODUCT_IDS.PREMIUM_VIDEOS];
+const IOS_PRODUCT_IDS: ProductId[] = Object.values(PRODUCT_IDS);
+
+const PLAN_PRIORITY: Record<PremiumPlan, number> = {
+  free: 0,
+  lifetime: 1,
+  yearly: 2,
+};
+
+const getPlanForProduct = (productId: string): PremiumPlan | null => {
+  return PRODUCT_PLAN_MAP[productId as ProductId] ?? null;
+};
 
 export interface IAPProduct {
   productId: string;
@@ -126,7 +146,7 @@ export const fetchProducts = async (): Promise<IAPProduct[]> => {
 /**
  * Request purchase for premium videos
  */
-export const purchasePremium = async (): Promise<boolean> => {
+export const purchaseProduct = async (productId: ProductId): Promise<boolean> => {
   if (!isIAPAvailable || !requestPurchase) {
     console.warn('IAP not available - cannot make purchase');
     return false;
@@ -134,7 +154,7 @@ export const purchasePremium = async (): Promise<boolean> => {
 
   try {
     await requestPurchase({
-      sku: PRODUCT_IDS.PREMIUM_VIDEOS,
+      sku: productId,
     });
     // Purchase processing happens in the listener
     return true;
@@ -150,33 +170,35 @@ export const purchasePremium = async (): Promise<boolean> => {
 
 /**
  * Verify and process a purchase
- * Returns true if purchase is valid
+ * Returns the plan that was activated if successful
  */
-export const verifyPurchase = async (purchase: any): Promise<boolean> => {
+export const verifyPurchase = async (purchase: any): Promise<PremiumPlan | null> => {
   if (!isIAPAvailable || !finishTransaction) {
     console.warn('IAP not available - cannot verify purchase');
-    return false;
+    return null;
   }
 
   try {
     // For production, you should verify receipt with your backend server
     // For now, we'll do basic client-side validation
 
-    if (purchase.productId === PRODUCT_IDS.PREMIUM_VIDEOS) {
+    const plan = getPlanForProduct(purchase.productId);
+    if (plan) {
       // Mark as premium in storage
       await setIsPremium(true);
+      await setPremiumPlan(plan);
 
       // Finish the transaction
       await finishTransaction({ purchase, isConsumable: false });
 
       console.log('Purchase verified and completed');
-      return true;
+      return plan;
     }
 
-    return false;
+    return null;
   } catch (error) {
     console.error('Error verifying purchase:', error);
-    return false;
+    return null;
   }
 };
 
@@ -184,36 +206,46 @@ export const verifyPurchase = async (purchase: any): Promise<boolean> => {
  * Restore previous purchases
  * Required by Apple for non-consumable purchases
  */
-export const restorePurchases = async (): Promise<boolean> => {
+export const restorePurchases = async (): Promise<PremiumPlan | null> => {
   if (!isIAPAvailable || !getAvailablePurchases) {
     console.warn('IAP not available - cannot restore purchases');
-    return false;
+    return null;
   }
 
   try {
     const purchases = await getAvailablePurchases();
+    let restoredPlan: PremiumPlan | null = null;
 
     if (purchases && purchases.length > 0) {
-      const premiumPurchase = purchases.find(
-        (purchase: any) => purchase.productId === PRODUCT_IDS.PREMIUM_VIDEOS
-      );
+      purchases.forEach((purchase: any) => {
+        const plan = getPlanForProduct(purchase.productId);
+        if (plan) {
+          if (
+            !restoredPlan ||
+            PLAN_PRIORITY[plan] > PLAN_PRIORITY[restoredPlan]
+          ) {
+            restoredPlan = plan;
+          }
+        }
+      });
 
-      if (premiumPurchase) {
+      if (restoredPlan) {
         await setIsPremium(true);
-        console.log('Premium purchase restored');
-        return true;
+        await setPremiumPlan(restoredPlan);
+        console.log(`Premium purchase restored (${restoredPlan})`);
+        return restoredPlan;
       }
     }
 
     console.log('No purchases to restore');
-    return false;
+    return null;
   } catch (error: any) {
     if (error?.message?.includes('E_IAP_NOT_AVAILABLE')) {
       console.warn('IAP not available - cannot restore purchases');
     } else {
       console.error('Error restoring purchases:', error);
     }
-    return false;
+    return null;
   }
 };
 
@@ -222,7 +254,7 @@ export const restorePurchases = async (): Promise<boolean> => {
  * Returns cleanup function
  */
 export const setupPurchaseListeners = (
-  onPurchaseSuccess: () => void,
+  onPurchaseSuccess: (plan: PremiumPlan) => void,
   onPurchaseError: (error: any) => void
 ): (() => void) => {
   if (!isIAPAvailable || !purchaseUpdatedListener || !purchaseErrorListener) {
@@ -239,10 +271,10 @@ export const setupPurchaseListeners = (
       if (receipt) {
         try {
           // Verify and process the purchase
-          const isValid = await verifyPurchase(purchase);
+          const plan = await verifyPurchase(purchase);
 
-          if (isValid) {
-            onPurchaseSuccess();
+          if (plan) {
+            onPurchaseSuccess(plan);
           }
         } catch (error) {
           console.error('Error processing purchase:', error);
@@ -269,33 +301,42 @@ export const setupPurchaseListeners = (
 /**
  * Check if user has active premium purchase
  */
-export const checkPremiumStatus = async (): Promise<boolean> => {
+export const checkPremiumStatus = async (): Promise<PremiumPlan | null> => {
   if (!isIAPAvailable || !getAvailablePurchases) {
     console.warn('IAP not available - cannot check purchase status');
-    return false;
+    return null;
   }
 
   try {
     const purchases = await getAvailablePurchases();
 
     if (purchases && purchases.length > 0) {
-      const hasPremium = purchases.some(
-        (purchase: any) => purchase.productId === PRODUCT_IDS.PREMIUM_VIDEOS
-      );
+      let detectedPlan: PremiumPlan | null = null;
+      purchases.forEach((purchase: any) => {
+        const plan = getPlanForProduct(purchase.productId);
+        if (
+          plan &&
+          (!detectedPlan ||
+            PLAN_PRIORITY[plan] > PLAN_PRIORITY[detectedPlan])
+        ) {
+          detectedPlan = plan;
+        }
+      });
 
-      if (hasPremium) {
+      if (detectedPlan) {
         await setIsPremium(true);
-        return true;
+        await setPremiumPlan(detectedPlan);
+        return detectedPlan;
       }
     }
 
-    return false;
+    return null;
   } catch (error: any) {
     if (error?.message?.includes('E_IAP_NOT_AVAILABLE')) {
       console.warn('IAP not available - cannot check purchase status');
     } else {
       console.error('Error checking premium status:', error);
     }
-    return false;
+    return null;
   }
 };

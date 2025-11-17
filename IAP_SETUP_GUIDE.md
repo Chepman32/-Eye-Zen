@@ -4,11 +4,12 @@ This guide will walk you through setting up in-app purchases for your EyeZen app
 
 ## Overview
 
-Your app now supports a **one-time, non-consumable** in-app purchase that unlocks:
-- **Free users**: 1 video per day
-- **Premium users**: 5 videos per day
+Your app now supports two purchase options:
 
-**Product ID**: `com.eyeszen.antonchepur.app.dailyfive`
+1. **Lifetime unlock (non-consumable)** – raises the daily limit from 1 to 5 sessions.
+   - Product ID: `com.eyeszen.antonchepur.app.dailyfive`
+2. **Yearly subscription (auto-renewable)** – unlocks *unlimited* daily sessions for $19.99/year.
+   - Product ID: `com.eyeszen.antonchepur.app.yearlyunlimited`
 
 ---
 
@@ -62,9 +63,13 @@ Your app now supports a **one-time, non-consumable** in-app purchase that unlock
 
 6. Click **"Create"**
 
-### Step 2: Create the In-App Purchase Product
+### Step 2: Create the In-App Purchase Products
 
-1. In your app's page, click on **"In-App Purchases"** in the left sidebar
+Create both products so the app can display them side-by-side.
+
+#### 2a. Lifetime Unlock (Existing)
+
+1. In your app's page, click on **"In-App Purchases"** in the left sidebar (under Features)
 
 2. Click the **"+"** button or **"Create"**
 
@@ -80,7 +85,30 @@ Your app now supports a **one-time, non-consumable** in-app purchase that unlock
 
 6. Click **"Create"**
 
+#### 2b. Yearly Subscription (New)
+
+1. Go to the **"Subscriptions"** section and create a new Subscription Group (e.g. `Unlimited Sessions`) if you haven’t already.
+
+2. Click the **"+"** button → **"New Subscription"**
+
+3. Choose **"Auto-Renewable Subscription"**
+
+4. Fill in the details:
+   - **Reference Name**: `Unlimited daily usage` (or similar)
+   - **Product ID**: `com.eyeszen.antonchepur.app.yearlyunlimited`
+   - **Duration**: `1 year`
+   - **Price**: select the tier that maps to **$19.99 USD**
+   - **Family Sharing**: optional (enable if desired)
+
+5. Provide localization metadata (display name + description) for each language you support. These strings are surfaced inside the app when the products load.
+
+6. Attach a review screenshot that showcases the unlimited plan (can reuse the paywall UI).
+
+7. Save the subscription.
+
 ### Step 3: Configure Product Details
+
+Complete the following for **both** products (lifetime unlock and yearly subscription):
 
 1. **Pricing**:
    - Click **"Price Schedule"** → **"Add Pricing"**

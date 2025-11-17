@@ -18,6 +18,11 @@ import { useTheme } from '../contexts/ThemeContext';
 import type { RootStackParamList } from '../../App';
 import { usePurchase } from '../contexts/PurchaseContext';
 import AsyncStorage from '../services/asyncStorageAdapter';
+import { type ProductId } from '../services/iapService';
+import {
+  PremiumPaywall,
+  createPaywallPlanOptions,
+} from '../components/PremiumPaywall';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -133,7 +138,8 @@ const OnboardingScreen: React.FC<
   const { theme } = useTheme();
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { products, purchase, isLoading, isPremium } = usePurchase();
+  const { products, purchase, restore, isLoading, isPremium } = usePurchase();
+  const [selectedProductId, setSelectedProductId] = useState<ProductId | null>(null);
 
   // Get slides based on current language with fallback to English
   const slides = useMemo(() => getSlidesForLanguage(i18n.language), [i18n.language]);
@@ -155,8 +161,24 @@ const OnboardingScreen: React.FC<
     itemVisiblePercentThreshold: 50,
   }).current;
 
-  const hasProduct = products.length > 0;
-  const isPurchaseSupported = Platform.OS === 'ios' && hasProduct;
+  const planOptions = useMemo(
+    () => createPaywallPlanOptions(products, t),
+    [products, t]
+  );
+
+  useEffect(() => {
+    if (planOptions.length === 0) {
+      setSelectedProductId(null);
+      return;
+    }
+
+    if (!selectedProductId || !planOptions.some((plan) => plan.id === selectedProductId)) {
+      setSelectedProductId(planOptions[0]?.id ?? null);
+    }
+  }, [planOptions, selectedProductId]);
+
+  const isPurchaseSupported = Platform.OS === 'ios' && planOptions.length > 0;
+  const purchaseDisabled = isLoading || !isPurchaseSupported || !selectedProductId;
   const onboardingCompletedRef = useRef(false);
 
   useEffect(() => {
@@ -186,70 +208,51 @@ const OnboardingScreen: React.FC<
   };
 
   const handlePurchase = async () => {
-    if (!isPurchaseSupported) {
+    if (!selectedProductId || !isPurchaseSupported) {
       Alert.alert(
         t('purchaseModal.unavailableTitle'),
         t('purchaseModal.unavailableMessage')
       );
       return;
     }
-    await purchase();
+    await purchase(selectedProductId);
+  };
+
+  const handleRestore = async () => {
+    if (Platform.OS !== 'ios') {
+      Alert.alert(
+        t('purchaseModal.unavailableTitle'),
+        t('purchaseModal.unavailableMessage')
+      );
+      return;
+    }
+    await restore();
   };
 
   const renderSlide = ({ item }: { item: OnboardingSlide }) => {
     const isLastSlide = item.isPaywall;
-    const product = products[0];
-    const price = product?.localizedPrice ?? '—';
-    const purchaseDisabled = isLoading || !isPurchaseSupported;
+    if (isLastSlide) {
+      return (
+        <View style={styles.slide}>
+          <PremiumPaywall
+            backgroundImage={item.image}
+            planOptions={planOptions}
+            selectedProductId={selectedProductId}
+            onSelectPlan={(id) => setSelectedProductId(id)}
+            onPurchase={handlePurchase}
+            onClose={handleSkip}
+            onRestore={handleRestore}
+            isLoading={isLoading}
+            isPurchaseSupported={isPurchaseSupported}
+            ctaDisabled={purchaseDisabled}
+          />
+        </View>
+      );
+    }
 
     return (
       <View style={styles.slide}>
         <Image source={item.image} style={styles.image} resizeMode="contain" />
-
-        {isLastSlide && (
-          <>
-            {/* Close Button - top right */}
-            <Pressable onPress={handleSkip} style={styles.closeButton}>
-              <Text style={[styles.closeButtonText, { color: theme.colors.text }]}>✕</Text>
-            </Pressable>
-
-            <View style={styles.paywallOverlay}>
-              {/* Benefit Text */}
-              <View style={[styles.benefitContainer, { backgroundColor: theme.colors.card }]}>
-                <Text style={[styles.benefitText, { color: theme.colors.text }]}>
-                  {t('onboarding.benefit')}
-                </Text>
-              </View>
-
-              {/* Price Badge */}
-              <View style={[styles.priceBadge, { backgroundColor: theme.colors.card }]}>
-                <Text style={[styles.priceText, { color: theme.colors.text }]}>{price}</Text>
-                <Text style={[styles.priceSubtext, { color: theme.colors.textSecondary }]}>
-                  {t('onboarding.oneTimePayment')}
-                </Text>
-              </View>
-
-              {/* Purchase Button */}
-              <Pressable
-                style={[
-                  styles.purchaseButton,
-                  { backgroundColor: theme.colors.buttonPrimary },
-                  purchaseDisabled && styles.purchaseButtonDisabled,
-                ]}
-                onPress={handlePurchase}
-                disabled={purchaseDisabled}>
-                <Text style={[styles.purchaseButtonText, { color: theme.colors.buttonText }]}>
-                  {isLoading ? t('onboarding.processing') : t('onboarding.unlockPremium')}
-                </Text>
-              </Pressable>
-              {!isPurchaseSupported && (
-                <Text style={[styles.unavailableMessage, { color: theme.colors.textSecondary }]}>
-                  {t('purchaseModal.unavailableMessage')}
-                </Text>
-              )}
-            </View>
-          </>
-        )}
       </View>
     );
   };
@@ -319,88 +322,6 @@ const styles = StyleSheet.create({
   image: {
     width: SCREEN_WIDTH,
     height: '100%',
-  },
-  paywallOverlay: {
-    position: 'absolute',
-    bottom: 35,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 0
-  },
-  benefitContainer: {
-    borderRadius: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    marginBottom: 16,
-    width: '100%',
-  },
-  benefitText: {
-    fontSize: 15,
-    fontWeight: '600',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  priceBadge: {
-    borderRadius: 20,
-    paddingHorizontal: 32,
-    paddingVertical: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  priceText: {
-    fontSize: 42,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  priceSubtext: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 6,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 20,
-    right: 24,
-    width: 24,
-    height: 24,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
-  closeButtonText: {
-    fontSize: 24,
-    fontWeight: '300',
-  },
-  purchaseButton: {
-    borderRadius: 28,
-    paddingVertical: 18,
-    paddingHorizontal: 48,
-    width: '100%',
-    alignItems: 'center',
-    shadowColor: '#5B4FB4',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  purchaseButtonText: {
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  purchaseButtonDisabled: {
-    opacity: 0.5,
-  },
-  unavailableMessage: {
-    marginTop: 12,
-    textAlign: 'center',
-    fontSize: 14,
   },
   bottomControls: {
     position: 'absolute',

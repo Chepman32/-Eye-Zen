@@ -13,9 +13,11 @@ import {
   disconnectIAP,
   setupPurchaseListeners,
   fetchProducts,
-  purchasePremium,
+  purchaseProduct,
   restorePurchases,
   IAPProduct,
+  ProductId,
+  PRODUCT_IDS,
 } from '../services/iapService';
 import {
   getAllStorageData,
@@ -24,17 +26,24 @@ import {
   setLastWatchDate,
   getLastWatchDate,
   resetDailyWatchCount,
+  setPremiumPlan as persistPremiumPlan,
 } from '../services/storageService';
 import { useReviewPrompt } from '../hooks/useReviewPrompt';
+import {
+  PremiumPlan,
+  PREMIUM_PLAN_LIMITS,
+  isUnlimitedPlan,
+} from '../types/premium';
 
 // Video limits
 const FREE_DAILY_LIMIT = 1;
-const PREMIUM_DAILY_LIMIT = 5;
 
 interface PurchaseContextType {
   // Premium status
   isPremium: boolean;
   isLoading: boolean;
+  premiumPlan: PremiumPlan;
+  isUnlimited: boolean;
 
   // Video limits
   dailyWatchCount: number;
@@ -46,7 +55,7 @@ interface PurchaseContextType {
   products: IAPProduct[];
 
   // Actions
-  purchase: () => Promise<void>;
+  purchase: (productId?: ProductId) => Promise<void>;
   restore: () => Promise<void>;
   incrementWatchCount: () => Promise<void>;
   refreshStatus: () => Promise<void>;
@@ -75,16 +84,26 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [dailyWatchCount, setDailyWatchCountState] = useState(0);
   const [products, setProducts] = useState<IAPProduct[]>([]);
+  const [premiumPlan, setPremiumPlanState] = useState<PremiumPlan>('free');
   const { recordPositiveEvent } = useReviewPrompt();
 
   // Calculate max daily limit based on premium status
-  const maxDailyLimit = isPremium ? PREMIUM_DAILY_LIMIT : FREE_DAILY_LIMIT;
+  const planLimit = PREMIUM_PLAN_LIMITS[premiumPlan] ?? FREE_DAILY_LIMIT;
+  const isUnlimited = isUnlimitedPlan(premiumPlan);
+  const maxDailyLimit = premiumPlan === 'free' ? FREE_DAILY_LIMIT : planLimit;
 
   // Check if user can watch more videos today
-  const canWatchVideo = dailyWatchCount < maxDailyLimit;
+  const canWatchVideo = isUnlimited || dailyWatchCount < maxDailyLimit;
 
   // Calculate remaining videos for today
-  const remainingVideos = Math.max(0, maxDailyLimit - dailyWatchCount);
+  const remainingVideos = isUnlimited
+    ? Infinity
+    : Math.max(0, maxDailyLimit - dailyWatchCount);
+
+  const applyPremiumPlan = (plan: PremiumPlan): void => {
+    setPremiumPlanState(plan);
+    setIsPremiumState(plan !== 'free');
+  };
 
   /**
    * Check if it's a new day and reset count if needed
@@ -114,7 +133,12 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
 
       // Load data from storage
       const storageData = await getAllStorageData();
-      setIsPremiumState(storageData.isPremium);
+      let plan = storageData.premiumPlan;
+      if (plan === 'free' && storageData.isPremium) {
+        plan = 'lifetime';
+        void persistPremiumPlan('lifetime');
+      }
+      applyPremiumPlan(plan);
       setDailyWatchCountState(storageData.dailyWatchCount);
 
       // Check for new day and reset if needed
@@ -165,15 +189,17 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
   /**
    * Handle successful purchase
    */
-  const handlePurchaseSuccess = useCallback(async () => {
-    setIsPremiumState(true);
+  const handlePurchaseSuccess = useCallback(async (plan: PremiumPlan) => {
+    applyPremiumPlan(plan);
     await setIsPremium(true);
+    await persistPremiumPlan(plan);
 
-    Alert.alert(
-      'Purchase Successful!',
-      `You can now watch up to ${PREMIUM_DAILY_LIMIT} videos per day!`,
-      [{ text: 'Great!' }]
-    );
+    const limit = PREMIUM_PLAN_LIMITS[plan];
+    const message = isUnlimitedPlan(plan)
+      ? 'You now have unlimited sessions every day!'
+      : `You can now watch up to ${limit} videos per day!`;
+
+    Alert.alert('Purchase Successful!', message, [{ text: 'Great!' }]);
     void recordPositiveEvent('purchase');
   }, [recordPositiveEvent]);
 
@@ -211,7 +237,7 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
   /**
    * Make a purchase
    */
-  const purchase = useCallback(async () => {
+  const purchase = useCallback(async (productId?: ProductId) => {
     if (Platform.OS !== 'ios') {
       Alert.alert(
         'Not Supported',
@@ -223,7 +249,12 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
 
     try {
       setIsLoading(true);
-      await purchasePremium();
+      let targetProduct = productId;
+      if (!targetProduct) {
+        const defaultProduct = products[0]?.productId as ProductId | undefined;
+        targetProduct = defaultProduct ?? PRODUCT_IDS.PREMIUM_VIDEOS;
+      }
+      await purchaseProduct(targetProduct);
     } catch (error) {
       console.error('Error making purchase:', error);
       Alert.alert(
@@ -234,7 +265,7 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [products]);
 
   /**
    * Restore previous purchases
@@ -242,11 +273,12 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
   const restore = useCallback(async () => {
     try {
       setIsLoading(true);
-      const restored = await restorePurchases();
+      const restoredPlan = await restorePurchases();
 
-      if (restored) {
-        setIsPremiumState(true);
+      if (restoredPlan) {
+        applyPremiumPlan(restoredPlan);
         await setIsPremium(true);
+        await persistPremiumPlan(restoredPlan);
         Alert.alert(
           'Restore Successful',
           'Your premium purchase has been restored!',
@@ -367,6 +399,8 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
   const value: PurchaseContextType = {
     isPremium,
     isLoading,
+    premiumPlan,
+    isUnlimited,
     dailyWatchCount,
     maxDailyLimit,
     canWatchVideo,

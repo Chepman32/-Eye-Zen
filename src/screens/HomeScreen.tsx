@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  useWindowDimensions,
+  type ViewStyle,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Haptic from 'react-native-haptic-feedback';
 import Animated, {
@@ -35,7 +42,7 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
     const base = Math.min(width, height) * (isTabletLayout ? 0.4 : 0.6);
     return Math.max(220, Math.min(base, 420));
   }, [height, width, isTabletLayout]);
-  const buttonWrapperStyle = useMemo(
+  const buttonWrapperStyle = useMemo<ViewStyle>(
     () => ({
       width: buttonSize,
       height: buttonSize,
@@ -48,7 +55,7 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
     }),
     [buttonSize]
   );
-  const circleStyle = useMemo(
+  const circleStyle = useMemo<ViewStyle>(
     () => ({
       width: '100%',
       height: '100%',

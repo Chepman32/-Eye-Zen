@@ -28,7 +28,8 @@
     "freePlan": "Free Plan",
     "videosRemaining": "Sessions remaining today",
     "upgradeToPremium": "⭐ Upgrade to Premium",
-    "watchUpTo5": "Watch up to 5 sessions per day with premium!"
+    "watchUpTo5": "Watch up to 5 sessions per day with premium!",
+    "unlimitedLabel": "Unlimited"
   },
   "purchaseModal": {
     "title": "Upgrade to Premium",
@@ -40,6 +41,12 @@
     "feature3": "Lifetime access",
     "feature4": "Support development",
     "oneTimePayment": "One-time payment",
+    "perYear": "Per year",
+    "yearlyPlanTitle": "Yearly Plan",
+    "yearlyPlanSubtitle": "Unlimited sessions, billed yearly",
+    "lifetimePlanTitle": "Lifetime Plan",
+    "lifetimePlanSubtitle": "One-time purchase, up to 5 sessions per day",
+    "bestValueBadge": "Best value",
     "purchaseNow": "Purchase Now",
     "restorePurchase": "Restore Purchase",
     "maybeLater": "Maybe Later",

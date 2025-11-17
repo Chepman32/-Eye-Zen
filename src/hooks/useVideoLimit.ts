@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { usePurchase } from '../contexts/PurchaseContext';
+import type { PremiumPlan } from '../types/premium';
 
 interface UseVideoLimitReturn {
   // Status
@@ -9,6 +10,8 @@ interface UseVideoLimitReturn {
   maxDailyLimit: number;
   isPremium: boolean;
   isLoading: boolean;
+  isUnlimited: boolean;
+  premiumPlan: PremiumPlan;
 
   // Actions
   checkAndIncrementWatch: () => Promise<boolean>;
@@ -27,6 +30,8 @@ export const useVideoLimit = (): UseVideoLimitReturn => {
     maxDailyLimit,
     isPremium,
     isLoading,
+    isUnlimited,
+    premiumPlan,
     incrementWatchCount,
   } = usePurchase();
 
@@ -47,12 +52,14 @@ export const useVideoLimit = (): UseVideoLimitReturn => {
    * Get a human-readable status message
    */
   const getStatusMessage = useCallback((): string => {
+    if (isUnlimited) {
+      return 'Premium: Unlimited sessions every day';
+    }
     if (isPremium) {
       return `Premium: ${remainingVideos} of ${maxDailyLimit} videos left today`;
-    } else {
-      return `Free: ${remainingVideos} of ${maxDailyLimit} video left today`;
     }
-  }, [isPremium, remainingVideos, maxDailyLimit]);
+    return `Free: ${remainingVideos} of ${maxDailyLimit} video left today`;
+  }, [isPremium, isUnlimited, remainingVideos, maxDailyLimit]);
 
   return {
     canWatchVideo,
@@ -61,6 +68,8 @@ export const useVideoLimit = (): UseVideoLimitReturn => {
     maxDailyLimit,
     isPremium,
     isLoading,
+    isUnlimited,
+    premiumPlan,
     checkAndIncrementWatch,
     getStatusMessage,
   };

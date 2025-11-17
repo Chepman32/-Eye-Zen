@@ -1,16 +1,19 @@
 import AsyncStorage from './asyncStorageAdapter';
+import type { PremiumPlan } from '../types/premium';
 
 // Storage keys
 const STORAGE_KEYS = {
   IS_PREMIUM: '@eyezen_is_premium',
   DAILY_WATCH_COUNT: '@eyezen_daily_watch_count',
   LAST_WATCH_DATE: '@eyezen_last_watch_date',
+  PREMIUM_PLAN: '@eyezen_premium_plan',
 } as const;
 
 export interface StorageData {
   isPremium: boolean;
   dailyWatchCount: number;
   lastWatchDate: string | null;
+  premiumPlan: PremiumPlan;
 }
 
 /**
@@ -75,6 +78,33 @@ export const setIsPremium = async (isPremium: boolean): Promise<void> => {
 };
 
 /**
+ * Get premium plan type from storage
+ */
+export const getPremiumPlan = async (): Promise<PremiumPlan> => {
+  try {
+    const value = await AsyncStorage.getItem(STORAGE_KEYS.PREMIUM_PLAN);
+    if (value === 'lifetime' || value === 'yearly') {
+      return value;
+    }
+    return 'free';
+  } catch (error) {
+    console.error('Error reading premium plan:', error);
+    return 'free';
+  }
+};
+
+/**
+ * Persist premium plan type
+ */
+export const setPremiumPlan = async (plan: PremiumPlan): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEYS.PREMIUM_PLAN, plan);
+  } catch (error) {
+    console.error('Error saving premium plan:', error);
+  }
+};
+
+/**
  * Get daily watch count from storage
  */
 export const getDailyWatchCount = async (): Promise<number> => {
@@ -126,16 +156,18 @@ export const setLastWatchDate = async (date: string): Promise<void> => {
  */
 export const getAllStorageData = async (): Promise<StorageData> => {
   try {
-    const [isPremium, dailyWatchCount, lastWatchDate] = await Promise.all([
+    const [isPremium, dailyWatchCount, lastWatchDate, premiumPlan] = await Promise.all([
       getIsPremium(),
       getDailyWatchCount(),
       getLastWatchDate(),
+      getPremiumPlan(),
     ]);
 
     return {
       isPremium,
       dailyWatchCount,
       lastWatchDate,
+      premiumPlan,
     };
   } catch (error) {
     console.error('Error reading storage data:', error);
@@ -143,6 +175,7 @@ export const getAllStorageData = async (): Promise<StorageData> => {
       isPremium: false,
       dailyWatchCount: 0,
       lastWatchDate: null,
+      premiumPlan: 'free',
     };
   }
 };

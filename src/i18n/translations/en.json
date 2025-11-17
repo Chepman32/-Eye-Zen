@@ -42,7 +42,10 @@
     "oneTimePayment": "One-time payment",
     "purchaseNow": "Purchase Now",
     "restorePurchase": "Restore Purchase",
-    "maybeLater": "Maybe Later"
+    "maybeLater": "Maybe Later",
+    "priceUnavailable": "Pricing unavailable",
+    "unavailableTitle": "Not Available",
+    "unavailableMessage": "In-app purchases are only available on iOS devices with a configured App Store account."
   },
   "settings": {
     "title": "Settings",

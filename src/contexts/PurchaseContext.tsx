@@ -6,7 +6,7 @@ import React, {
   useCallback,
   ReactNode,
 } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Alert, Platform, AppState } from 'react-native';
 import type { PurchaseError } from 'react-native-iap';
 import {
   initIAP,
@@ -212,6 +212,15 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
    * Make a purchase
    */
   const purchase = useCallback(async () => {
+    if (Platform.OS !== 'ios') {
+      Alert.alert(
+        'Not Supported',
+        'Purchases are only available on iOS devices at this time.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
     try {
       setIsLoading(true);
       await purchasePremium();
@@ -237,6 +246,7 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
 
       if (restored) {
         setIsPremiumState(true);
+        await setIsPremium(true);
         Alert.alert(
           'Restore Successful',
           'Your premium purchase has been restored!',
@@ -343,8 +353,15 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
 
   // Check for new day periodically (every time app comes to foreground)
   useEffect(() => {
-    const interval = setInterval(checkAndResetDailyCount, 60000); // Check every minute
-    return () => clearInterval(interval);
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        void checkAndResetDailyCount();
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, [checkAndResetDailyCount]);
 
   const value: PurchaseContextType = {

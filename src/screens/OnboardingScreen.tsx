@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   Pressable,
   FlatList,
   ViewToken,
+  Alert,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -131,7 +133,7 @@ const OnboardingScreen: React.FC<
   const { theme } = useTheme();
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { products, purchase, isLoading } = usePurchase();
+  const { products, purchase, isLoading, isPremium } = usePurchase();
 
   // Get slides based on current language with fallback to English
   const slides = useMemo(() => getSlidesForLanguage(i18n.language), [i18n.language]);
@@ -153,6 +155,21 @@ const OnboardingScreen: React.FC<
     itemVisiblePercentThreshold: 50,
   }).current;
 
+  const hasProduct = products.length > 0;
+  const isPurchaseSupported = Platform.OS === 'ios' && hasProduct;
+  const onboardingCompletedRef = useRef(false);
+
+  useEffect(() => {
+    if (isPremium && !onboardingCompletedRef.current) {
+      onboardingCompletedRef.current = true;
+      const completeOnboarding = async () => {
+        await AsyncStorage.setItem('@eyezen_onboarding_completed', 'true');
+        navigation.replace('Home');
+      };
+      completeOnboarding();
+    }
+  }, [isPremium, navigation]);
+
   const handleNext = () => {
     if (currentIndex < slides.length - 1) {
       flatListRef.current?.scrollToIndex({
@@ -169,15 +186,21 @@ const OnboardingScreen: React.FC<
   };
 
   const handlePurchase = async () => {
+    if (!isPurchaseSupported) {
+      Alert.alert(
+        t('purchaseModal.unavailableTitle'),
+        t('purchaseModal.unavailableMessage')
+      );
+      return;
+    }
     await purchase();
-    // After purchase, go to home
-    await AsyncStorage.setItem('@eyezen_onboarding_completed', 'true');
-    navigation.replace('Home');
   };
 
   const renderSlide = ({ item }: { item: OnboardingSlide }) => {
     const isLastSlide = item.isPaywall;
-    const price = products.length > 0 ? products[0].localizedPrice : '$2.99';
+    const product = products[0];
+    const price = product?.localizedPrice ?? '—';
+    const purchaseDisabled = isLoading || !isPurchaseSupported;
 
     return (
       <View style={styles.slide}>
@@ -208,13 +231,22 @@ const OnboardingScreen: React.FC<
 
               {/* Purchase Button */}
               <Pressable
-                style={[styles.purchaseButton, { backgroundColor: theme.colors.buttonPrimary }]}
+                style={[
+                  styles.purchaseButton,
+                  { backgroundColor: theme.colors.buttonPrimary },
+                  purchaseDisabled && styles.purchaseButtonDisabled,
+                ]}
                 onPress={handlePurchase}
-                disabled={isLoading}>
+                disabled={purchaseDisabled}>
                 <Text style={[styles.purchaseButtonText, { color: theme.colors.buttonText }]}>
                   {isLoading ? t('onboarding.processing') : t('onboarding.unlockPremium')}
                 </Text>
               </Pressable>
+              {!isPurchaseSupported && (
+                <Text style={[styles.unavailableMessage, { color: theme.colors.textSecondary }]}>
+                  {t('purchaseModal.unavailableMessage')}
+                </Text>
+              )}
             </View>
           </>
         )}
@@ -361,6 +393,14 @@ const styles = StyleSheet.create({
   purchaseButtonText: {
     fontSize: 18,
     fontWeight: '700',
+  },
+  purchaseButtonDisabled: {
+    opacity: 0.5,
+  },
+  unavailableMessage: {
+    marginTop: 12,
+    textAlign: 'center',
+    fontSize: 14,
   },
   bottomControls: {
     position: 'absolute',

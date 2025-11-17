@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   Pressable,
   ActivityIndicator,
   Dimensions,
+  Platform,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Haptic from 'react-native-haptic-feedback';
@@ -30,15 +32,36 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { purchase, restore, isLoading, products } = usePurchase();
+  const [pendingAction, setPendingAction] = useState<'purchase' | 'restore' | null>(null);
 
   const handlePurchase = async () => {
+    if (!isPurchaseSupported) {
+      Alert.alert(t('purchaseModal.unavailableTitle'), t('purchaseModal.unavailableMessage'));
+      return;
+    }
+
     Haptic.trigger('impactMedium', { enableVibrateFallback: true });
-    await purchase();
+    try {
+      setPendingAction('purchase');
+      await purchase();
+    } finally {
+      setPendingAction(null);
+    }
   };
 
   const handleRestore = async () => {
+    if (!isPurchaseSupported) {
+      Alert.alert(t('purchaseModal.unavailableTitle'), t('purchaseModal.unavailableMessage'));
+      return;
+    }
+
     Haptic.trigger('impactLight', { enableVibrateFallback: true });
-    await restore();
+    try {
+      setPendingAction('restore');
+      await restore();
+    } finally {
+      setPendingAction(null);
+    }
   };
 
   const handleClose = () => {
@@ -47,7 +70,10 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   };
 
   const product = products[0];
-  const price = product?.localizedPrice || '$2.99'; // Fallback price
+  const price = product?.localizedPrice || t('purchaseModal.priceUnavailable');
+  const isPurchaseSupported = Platform.OS === 'ios' && !!product;
+  const purchaseDisabled = isLoading || !isPurchaseSupported;
+  const restoreDisabled = isLoading || !isPurchaseSupported;
 
   return (
     <Modal
@@ -106,20 +132,25 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
             </Text>
             <Text style={[styles.price, { color: theme.colors.primary }]}>{price}</Text>
           </View>
+          {!isPurchaseSupported && (
+            <Text style={[styles.unavailableMessage, { color: theme.colors.textSecondary }]}>
+              {t('purchaseModal.unavailableMessage')}
+            </Text>
+          )}
 
           {/* Buttons */}
           <View style={styles.buttons}>
             {/* Purchase Button */}
             <Pressable
               onPress={handlePurchase}
-              disabled={isLoading}
-              style={styles.purchaseButtonWrapper}>
+              disabled={purchaseDisabled}
+              style={[styles.purchaseButtonWrapper, purchaseDisabled && styles.disabledButton]}>
               <LinearGradient
                 colors={[theme.colors.gradientStart, theme.colors.gradientEnd]}
                 start={{x: 0, y: 0}}
                 end={{x: 1, y: 0}}
-                style={styles.purchaseButton}>
-                {isLoading ? (
+                style={[styles.purchaseButton, purchaseDisabled && styles.purchaseButtonDisabled]}>
+                {isLoading && pendingAction === 'purchase' ? (
                   <ActivityIndicator color={theme.colors.buttonText} />
                 ) : (
                   <Text style={[styles.purchaseButtonText, { color: theme.colors.buttonText }]}>
@@ -133,11 +164,15 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
             {showRestoreButton && (
               <Pressable
                 onPress={handleRestore}
-                disabled={isLoading}
-                style={styles.restoreButton}>
-                <Text style={[styles.restoreButtonText, { color: theme.colors.primary }]}>
-                  {t('purchaseModal.restorePurchase')}
-                </Text>
+                disabled={restoreDisabled}
+                style={[styles.restoreButton, restoreDisabled && styles.disabledButton]}>
+                {isLoading && pendingAction === 'restore' ? (
+                  <ActivityIndicator color={theme.colors.primary} />
+                ) : (
+                  <Text style={[styles.restoreButtonText, { color: theme.colors.primary }]}>
+                    {t('purchaseModal.restorePurchase')}
+                  </Text>
+                )}
               </Pressable>
             )}
 
@@ -238,9 +273,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.5,
   },
+  purchaseButtonDisabled: {
+    opacity: 0.6,
+  },
   restoreButton: {
     paddingVertical: 12,
     alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   restoreButtonText: {
     fontSize: 16,
@@ -252,5 +293,10 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 16,
+  },
+  unavailableMessage: {
+    textAlign: 'center',
+    marginBottom: 16,
+    fontSize: 14,
   },
 });

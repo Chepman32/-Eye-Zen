@@ -47,13 +47,13 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
       width: buttonSize,
       height: buttonSize,
       borderRadius: buttonSize / 2,
-      shadowColor: '#4CAF50',
+      shadowColor: theme.colors.primary,
       shadowOpacity: 0.35,
       shadowRadius: 16,
       shadowOffset: { width: 0, height: 8 },
       elevation: 6,
     }),
-    [buttonSize]
+    [buttonSize, theme.colors.primary]
   );
   const circleStyle = useMemo<ViewStyle>(
     () => ({
@@ -128,7 +128,11 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
           onPress={onSettings}
           style={[
             styles.settingsButton,
-            { backgroundColor: theme.colors.surface, top: safeTopSpacing },
+            {
+              backgroundColor: theme.colors.surface,
+              top: safeTopSpacing,
+              shadowColor: theme.colors.text,
+            },
           ]}
           android_ripple={{ color: theme.colors.primary, borderless: true }}>
           <Icon name="settings-outline" size={24} color={theme.colors.text} />
@@ -144,7 +148,7 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
                 <Pressable
                   onPress={onStart}
                   style={circleStyle}
-                  android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}>
+                  android_ripple={{ color: `${theme.colors.textInverse}40`, borderless: true }}>
                   <LinearGradient colors={[theme.colors.gradientStart, theme.colors.gradientEnd]} style={circleStyle}>
                     <Text style={[styles.startText, { color: theme.colors.textInverse }]}>{t('home.start')}</Text>
                   </LinearGradient>
@@ -159,7 +163,7 @@ const HomeScreen: React.FC<NativeStackScreenProps<RootStackParamList, 'Home'>> =
               <Pressable
                 onPress={onStart}
                 style={circleStyle}
-                android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: true }}>
+                android_ripple={{ color: `${theme.colors.textInverse}40`, borderless: true }}>
                 <LinearGradient colors={[theme.colors.gradientStart, theme.colors.gradientEnd]} style={circleStyle}>
                   <Text style={[styles.startText, { color: theme.colors.textInverse }]}>{t('home.start')}</Text>
                 </LinearGradient>
@@ -187,7 +191,6 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
     shadowOpacity: 0.15,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },

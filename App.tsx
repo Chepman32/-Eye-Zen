@@ -17,7 +17,7 @@ import VideoScreen from './src/screens/VideoScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import { enableScreens } from 'react-native-screens';
 import { PurchaseProvider } from './src/contexts/PurchaseContext';
-import { ThemeProvider } from './src/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { SettingsProvider } from './src/contexts/SettingsContext';
 import './src/i18n/i18n';
 
@@ -34,18 +34,16 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const defaultOrientation = Platform.OS === 'ios' && Platform.isPad ? 'all' : 'portrait';
 
-function App() {
+function AppNavigator() {
+  const { theme } = useTheme();
+
   return (
-    <ThemeProvider>
-      <SettingsProvider>
-        <PurchaseProvider>
-          <SafeAreaProvider>
-            <NavigationContainer
-              theme={{
-                ...DefaultTheme,
-                colors: { ...DefaultTheme.colors, background: '#FFFFFF' },
-              }}
-            >
+    <NavigationContainer
+      theme={{
+        ...DefaultTheme,
+        colors: { ...DefaultTheme.colors, background: theme.colors.background },
+      }}
+    >
               <Stack.Navigator
                 initialRouteName="Splash"
                 screenOptions={{ headerShown: false, animation: 'fade', orientation: defaultOrientation }}
@@ -71,6 +69,16 @@ function App() {
                 />
               </Stack.Navigator>
             </NavigationContainer>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <SettingsProvider>
+        <PurchaseProvider>
+          <SafeAreaProvider>
+            <AppNavigator />
           </SafeAreaProvider>
         </PurchaseProvider>
       </SettingsProvider>

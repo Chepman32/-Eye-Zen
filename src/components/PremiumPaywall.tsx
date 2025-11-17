@@ -134,11 +134,11 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
 
   const content = (
     <LinearGradient
-      colors={['rgba(255,255,255,0.98)', 'rgba(255,255,255,0.95)']}
+      colors={[`${theme.colors.background}FA`, `${theme.colors.background}F2`]}
       style={styles.gradient}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <Pressable onPress={onClose} hitSlop={10} style={styles.headerButton}>
+          <Pressable onPress={onClose} hitSlop={10} style={[styles.headerButton, { backgroundColor: `${theme.colors.text}0D` }]}>
             <Text style={[styles.headerButtonText, { color: theme.colors.text }]}>✕</Text>
           </Pressable>
           <Pressable onPress={onRestore}>
@@ -149,12 +149,12 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          <Text style={styles.title}>Take care of your{'\n'}eyes and wellness</Text>
+          <Text style={[styles.title, { color: theme.colors.text }]}>Take care of your{'\n'}eyes and wellness</Text>
 
           <View style={styles.features}>
             {features.map((feature) => (
               <View key={feature.text} style={styles.featureRow}>
-                <Ionicons name={feature.icon as any} size={24} color="#000" />
+                <Ionicons name={feature.icon as any} size={24} color={theme.colors.text} />
                 <Text style={[styles.featureText, { color: theme.colors.text }]}>{feature.text}</Text>
               </View>
             ))}
@@ -166,23 +166,31 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
               onPress={() => planOptions[0] && onSelectPlan(planOptions[0].id)}
               style={[
                 styles.planCard,
+                {
+                  borderColor: selectedProductId === planOptions[0]?.id ? theme.colors.success : theme.colors.border,
+                  backgroundColor: selectedProductId === planOptions[0]?.id ? theme.colors.surface : theme.colors.backgroundSecondary,
+                  shadowColor: selectedProductId === planOptions[0]?.id ? theme.colors.success : undefined,
+                },
                 selectedProductId === planOptions[0]?.id && styles.planCardSelected,
               ]}>
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>Save 95%</Text>
+              <View style={[styles.badge, { backgroundColor: theme.colors.success }]}>
+                <Text style={[styles.badgeText, { color: theme.colors.textInverse }]}>Save 95%</Text>
               </View>
               <View style={styles.planHeader}>
-                <View style={[styles.radioOuter, selectedProductId === planOptions[0]?.id && styles.radioOuterSelected]}>
-                  {selectedProductId === planOptions[0]?.id && <View style={styles.radioInner} />}
+                <View style={[
+                  styles.radioOuter,
+                  { borderColor: selectedProductId === planOptions[0]?.id ? theme.colors.success : theme.colors.border }
+                ]}>
+                  {selectedProductId === planOptions[0]?.id && <View style={[styles.radioInner, { backgroundColor: theme.colors.success }]} />}
                 </View>
                 <View style={styles.planText}>
-                  <Text style={styles.planTitle}>Yearly Plan</Text>
+                  <Text style={[styles.planTitle, { color: theme.colors.text }]}>Yearly Plan</Text>
                 </View>
                 <View style={styles.planPriceGroup}>
-                  <Text style={styles.planPrice}>
+                  <Text style={[styles.planPrice, { color: theme.colors.text }]}>
                     {planOptions[0]?.priceDisplay || '$9.99'}
                   </Text>
-                  <Text style={styles.planPriceCaption}>Per year</Text>
+                  <Text style={[styles.planPriceCaption, { color: theme.colors.text }]}>Per year</Text>
                 </View>
               </View>
             </Pressable>
@@ -192,44 +200,55 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
               onPress={() => planOptions[1] && onSelectPlan(planOptions[1].id)}
               style={[
                 styles.planCard,
+                {
+                  borderColor: selectedProductId === planOptions[1]?.id ? theme.colors.success : theme.colors.border,
+                  backgroundColor: selectedProductId === planOptions[1]?.id ? theme.colors.surface : theme.colors.backgroundSecondary,
+                  shadowColor: selectedProductId === planOptions[1]?.id ? theme.colors.success : undefined,
+                },
                 selectedProductId === planOptions[1]?.id && styles.planCardSelected,
               ]}>
               <View style={styles.planHeader}>
-                <View style={[styles.radioOuter, selectedProductId === planOptions[1]?.id && styles.radioOuterSelected]}>
-                  {selectedProductId === planOptions[1]?.id && <View style={styles.radioInner} />}
+                <View style={[
+                  styles.radioOuter,
+                  { borderColor: selectedProductId === planOptions[1]?.id ? theme.colors.success : theme.colors.border }
+                ]}>
+                  {selectedProductId === planOptions[1]?.id && <View style={[styles.radioInner, { backgroundColor: theme.colors.success }]} />}
                 </View>
                 <View style={styles.planText}>
-                  <Text style={styles.planTitle}>7 days free trial</Text>
+                  <Text style={[styles.planTitle, { color: theme.colors.text }]}>7 days free trial</Text>
                 </View>
                 <View style={styles.planPriceGroup}>
-                  <Text style={styles.planPriceCaption}>
-                    then <Text style={styles.planPrice}>{planOptions[1]?.priceDisplay || '$3.99'}</Text>
+                  <Text style={[styles.planPriceCaption, { color: theme.colors.text }]}>
+                    then <Text style={[styles.planPrice, { color: theme.colors.text }]}>{planOptions[1]?.priceDisplay || '$3.99'}</Text>
                   </Text>
-                  <Text style={styles.planPriceCaption}>per week</Text>
+                  <Text style={[styles.planPriceCaption, { color: theme.colors.text }]}>per week</Text>
                 </View>
               </View>
             </Pressable>
           </View>
 
           {/* Free Trial Toggle */}
-          <View style={styles.toggleContainer}>
-            <Text style={styles.toggleLabel}>Enable the free trial</Text>
+          <View style={[styles.toggleContainer, { backgroundColor: theme.colors.backgroundSecondary }]}>
+            <Text style={[styles.toggleLabel, { color: theme.colors.text }]}>Enable the free trial</Text>
             <Switch
               value={freeTrialEnabled}
               onValueChange={setFreeTrialEnabled}
-              trackColor={{ false: '#D1D1D6', true: '#5EC16A' }}
-              thumbColor="#fff"
+              trackColor={{ false: theme.colors.border, true: theme.colors.success }}
+              thumbColor={theme.colors.surface}
             />
           </View>
 
           {!isPurchaseSupported && (
-            <Text style={styles.unavailableText}>{t('purchaseModal.unavailableMessage')}</Text>
+            <Text style={[styles.unavailableText, { color: theme.colors.textSecondary }]}>{t('purchaseModal.unavailableMessage')}</Text>
           )}
 
           <Pressable
             style={[
               styles.ctaButton,
-              { backgroundColor: theme.colors.buttonPrimary },
+              {
+                backgroundColor: theme.colors.buttonPrimary,
+                shadowColor: theme.colors.buttonPrimary,
+              },
               (ctaDisabled || !isPurchaseSupported) && styles.ctaDisabled,
             ]}
             onPress={onPurchase}
@@ -241,7 +260,7 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
                 <Text style={[styles.ctaText, { color: theme.colors.buttonText }]}>
                   Continue
                 </Text>
-                <Ionicons name="arrow-forward" size={24} color="#fff" style={styles.ctaArrow} />
+                <Ionicons name="arrow-forward" size={24} color={theme.colors.buttonText} style={styles.ctaArrow} />
               </View>
             )}
           </Pressable>
@@ -286,7 +305,6 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.05)',
   },
   headerButtonText: {
     fontSize: 20,
@@ -309,17 +327,14 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#555',
     marginTop: 4,
     marginBottom: 16,
   },
   metricCard: {
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
     marginBottom: 24,
-    shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
@@ -328,17 +343,14 @@ const styles = StyleSheet.create({
   metricNumber: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#000',
   },
   metricLabel: {
     fontSize: 16,
-    color: '#000',
     marginTop: 4,
     marginBottom: 8,
   },
   stars: {
     fontSize: 18,
-    color: '#FFD700',
     letterSpacing: 4,
   },
   features: {
@@ -361,29 +373,22 @@ const styles = StyleSheet.create({
   planCard: {
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: '#E5E5EA',
     padding: 18,
-    backgroundColor: '#F2F2F7',
     marginBottom: 12,
   },
   planCardSelected: {
-    borderColor: '#5EC16A',
-    backgroundColor: '#fff',
-    shadowColor: '#5EC16A',
     shadowOpacity: 0.15,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 2,
   },
   planCardHighlight: {
-    borderColor: '#5EC16A',
   },
   badge: {
     position: 'absolute',
     top: -12,
     left: '50%',
     transform: [{ translateX: -40 }],
-    backgroundColor: '#5EC16A',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 6,
@@ -392,7 +397,6 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#fff',
   },
   planHeader: {
     flexDirection: 'row',
@@ -403,19 +407,16 @@ const styles = StyleSheet.create({
     height: 28,
     borderRadius: 14,
     borderWidth: 2,
-    borderColor: '#D1D1D6',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
   radioOuterSelected: {
-    borderColor: '#5EC16A',
   },
   radioInner: {
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: '#5EC16A',
   },
   planText: {
     flex: 1,
@@ -423,11 +424,9 @@ const styles = StyleSheet.create({
   planTitle: {
     fontSize: 19,
     fontWeight: '600',
-    color: '#000',
   },
   planSubtitle: {
     fontSize: 14,
-    color: '#666',
     marginTop: 4,
   },
   planPriceGroup: {
@@ -436,23 +435,19 @@ const styles = StyleSheet.create({
   planPrice: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#000',
   },
   planPriceCaption: {
     fontSize: 14,
-    color: '#000',
     marginTop: 2,
   },
   unavailableText: {
     textAlign: 'center',
-    color: '#888',
     marginTop: 12,
   },
   toggleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#F2F2F7',
     borderRadius: 16,
     padding: 20,
     marginTop: 16,
@@ -461,7 +456,6 @@ const styles = StyleSheet.create({
   toggleLabel: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000',
   },
   ctaButton: {
     marginTop: 24,
@@ -469,7 +463,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#FF2D55',
     shadowOpacity: 0.3,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },

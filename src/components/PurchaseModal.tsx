@@ -28,6 +28,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const [pendingAction, setPendingAction] = useState<'purchase' | 'restore' | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<ProductId | null>(null);
   const planOptions = createPaywallPlanOptions(products, t);
+  const hasAvailablePlan = planOptions.some((plan) => plan.available);
 
   useEffect(() => {
     if (planOptions.length === 0) {
@@ -80,7 +81,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     onClose();
   };
 
-  const isPurchaseSupported = Platform.OS === 'ios' && planOptions.length > 0;
+  const isPurchaseSupported = Platform.OS === 'ios' && hasAvailablePlan;
   const purchaseDisabled = isLoading || !isPurchaseSupported || !selectedProductId;
 
   return (

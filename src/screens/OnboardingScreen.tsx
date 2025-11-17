@@ -165,6 +165,10 @@ const OnboardingScreen: React.FC<
     () => createPaywallPlanOptions(products, t),
     [products, t]
   );
+  const hasAvailablePlan = useMemo(
+    () => planOptions.some((plan) => plan.available),
+    [planOptions]
+  );
 
   useEffect(() => {
     if (planOptions.length === 0) {
@@ -177,7 +181,7 @@ const OnboardingScreen: React.FC<
     }
   }, [planOptions, selectedProductId]);
 
-  const isPurchaseSupported = Platform.OS === 'ios' && planOptions.length > 0;
+  const isPurchaseSupported = Platform.OS === 'ios' && hasAvailablePlan;
   const purchaseDisabled = isLoading || !isPurchaseSupported || !selectedProductId;
   const onboardingCompletedRef = useRef(false);
 

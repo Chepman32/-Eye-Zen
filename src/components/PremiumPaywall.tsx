@@ -21,63 +21,76 @@ import { PRODUCT_IDS } from '../services/iapService';
 
 export interface PaywallPlanOption {
   id: ProductId;
-  product: IAPProduct;
   title: string;
   subtitle: string;
   badge?: string;
   priceCaption: string;
   highlight?: boolean;
+  priceDisplay: string;
+  available: boolean;
 }
 
 export const createPaywallPlanOptions = (
   products: IAPProduct[],
   t: TFunction
 ): PaywallPlanOption[] => {
-  const lifetimeProduct = products.find(
-    (p) => p.productId === PRODUCT_IDS.PREMIUM_VIDEOS
-  );
-  const yearlyProduct = products.find(
-    (p) => p.productId === PRODUCT_IDS.YEARLY_UNLIMITED
-  );
-  const weeklyProduct = products.find(
-    (p) => p.productId === PRODUCT_IDS.WEEKLY_TRIAL
-  );
-
-  const options: PaywallPlanOption[] = [];
-
-  if (yearlyProduct) {
-    options.push({
+  const configs: Array<{
+    id: ProductId;
+    title: string;
+    subtitle: string;
+    badge?: string;
+    priceCaption: string;
+    highlight?: boolean;
+    defaultPrice: string;
+    alwaysShow: boolean;
+  }> = [
+    {
       id: PRODUCT_IDS.YEARLY_UNLIMITED,
-      product: yearlyProduct,
       title: t('purchaseModal.yearlyPlanTitle'),
       subtitle: t('purchaseModal.yearlyPlanSubtitle'),
       badge: t('purchaseModal.bestValueBadge'),
       priceCaption: t('purchaseModal.perYear'),
       highlight: true,
-    });
-  }
-
-  if (weeklyProduct) {
-    options.push({
+      defaultPrice: '$9.99',
+      alwaysShow: true,
+    },
+    {
       id: PRODUCT_IDS.WEEKLY_TRIAL,
-      product: weeklyProduct,
       title: '7 days free trial',
       subtitle: 'then $3.99 per week',
       priceCaption: 'per week',
-    });
-  }
-
-  if (lifetimeProduct) {
-    options.push({
+      defaultPrice: '$3.99',
+      alwaysShow: true,
+    },
+    {
       id: PRODUCT_IDS.PREMIUM_VIDEOS,
-      product: lifetimeProduct,
       title: t('purchaseModal.lifetimePlanTitle'),
       subtitle: t('purchaseModal.lifetimePlanSubtitle'),
       priceCaption: t('purchaseModal.oneTimePayment'),
-    });
-  }
+      defaultPrice: '$39.99',
+      alwaysShow: false,
+    },
+  ];
 
-  return options;
+  return configs.reduce<PaywallPlanOption[]>((acc, config) => {
+    const product = products.find((p) => p.productId === config.id);
+    if (!product && !config.alwaysShow) {
+      return acc;
+    }
+
+    acc.push({
+      id: config.id,
+      title: config.title,
+      subtitle: config.subtitle,
+      badge: config.badge,
+      priceCaption: config.priceCaption,
+      highlight: config.highlight,
+      priceDisplay: product?.localizedPrice ?? config.defaultPrice,
+      available: Boolean(product),
+    });
+
+    return acc;
+  }, []);
 };
 
 interface PremiumPaywallProps {
@@ -111,12 +124,12 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
 
   const features = [
     {
-      icon: 'create-outline',
-      text: '300+ sketches for practice',
+      icon: 'eye-outline',
+      text: 'Unlimited eye exercise sessions',
     },
-    { icon: 'logo-android', text: 'Unlimited AI generated drawings' },
-    { icon: 'phone-portrait-outline', text: 'Access to Image Projector' },
-    { icon: 'ribbon-outline', text: 'Ad free experience' },
+    { icon: 'people-outline', text: 'Family Sharing' },
+    { icon: 'newspaper-outline', text: 'New exercies updates' },
+    { icon: 'medkit-outline', text: 'Guaranteed relief' },
   ];
 
   const content = (
@@ -167,7 +180,7 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
                 </View>
                 <View style={styles.planPriceGroup}>
                   <Text style={styles.planPrice}>
-                    {planOptions[0]?.product.localizedPrice || '$9.99'}
+                    {planOptions[0]?.priceDisplay || '$9.99'}
                   </Text>
                   <Text style={styles.planPriceCaption}>Per year</Text>
                 </View>
@@ -190,7 +203,7 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
                 </View>
                 <View style={styles.planPriceGroup}>
                   <Text style={styles.planPriceCaption}>
-                    then <Text style={styles.planPrice}>{planOptions[1]?.product.localizedPrice || '$3.99'}</Text>
+                    then <Text style={styles.planPrice}>{planOptions[1]?.priceDisplay || '$3.99'}</Text>
                   </Text>
                   <Text style={styles.planPriceCaption}>per week</Text>
                 </View>
@@ -282,6 +295,7 @@ const styles = StyleSheet.create({
   restore: {
     textDecorationLine: 'underline',
     fontWeight: '600',
+    marginRight: 20,
   },
   scrollContent: {
     paddingBottom: 60,

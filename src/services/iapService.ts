@@ -40,6 +40,7 @@ export type { PurchaseError, Product, Purchase } from 'react-native-iap';
 export const PRODUCT_IDS = {
   PREMIUM_VIDEOS: 'com.eyeszen.antonchepur.app.dailyfive', // iOS product ID (lifetime)
   YEARLY_UNLIMITED: 'com.eyeszen.antonchepur.app.yearlyunlimited', // subscription
+  WEEKLY_TRIAL: 'com.eyeszen.antonchepur.app.weeklytrial', // weekly subscription with trial
 } as const;
 
 export type ProductId = (typeof PRODUCT_IDS)[keyof typeof PRODUCT_IDS];
@@ -48,6 +49,7 @@ export type ProductId = (typeof PRODUCT_IDS)[keyof typeof PRODUCT_IDS];
 const PRODUCT_PLAN_MAP: Record<ProductId, PremiumPlan> = {
   [PRODUCT_IDS.PREMIUM_VIDEOS]: 'lifetime',
   [PRODUCT_IDS.YEARLY_UNLIMITED]: 'yearly',
+  [PRODUCT_IDS.WEEKLY_TRIAL]: 'yearly', // Maps to yearly plan for now
 };
 
 // iOS product IDs array

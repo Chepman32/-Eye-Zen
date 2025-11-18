@@ -26,7 +26,7 @@ export interface PaywallPlanOption {
   badge?: string;
   priceCaption: string;
   highlight?: boolean;
-  priceDisplay: string;
+  priceDisplay?: string;
   available: boolean;
 }
 
@@ -41,7 +41,6 @@ export const createPaywallPlanOptions = (
     badge?: string;
     priceCaption: string;
     highlight?: boolean;
-    defaultPrice: string;
     alwaysShow: boolean;
   }> = [
     {
@@ -51,7 +50,6 @@ export const createPaywallPlanOptions = (
       badge: t('purchaseModal.bestValueBadge'),
       priceCaption: t('purchaseModal.perYear'),
       highlight: true,
-      defaultPrice: '$9.99',
       alwaysShow: true,
     },
     {
@@ -59,7 +57,6 @@ export const createPaywallPlanOptions = (
       title: '7 days free trial',
       subtitle: 'then $3.99 per week',
       priceCaption: 'per week',
-      defaultPrice: '$3.99',
       alwaysShow: true,
     },
     {
@@ -67,7 +64,6 @@ export const createPaywallPlanOptions = (
       title: t('purchaseModal.lifetimePlanTitle'),
       subtitle: t('purchaseModal.lifetimePlanSubtitle'),
       priceCaption: t('purchaseModal.oneTimePayment'),
-      defaultPrice: '$39.99',
       alwaysShow: false,
     },
   ];
@@ -85,7 +81,7 @@ export const createPaywallPlanOptions = (
       badge: config.badge,
       priceCaption: config.priceCaption,
       highlight: config.highlight,
-      priceDisplay: product?.localizedPrice ?? config.defaultPrice,
+      priceDisplay: product?.localizedPrice,
       available: Boolean(product),
     });
 
@@ -188,7 +184,7 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
                 </View>
                 <View style={styles.planPriceGroup}>
                   <Text style={[styles.planPrice, { color: theme.colors.text }]}>
-                    {planOptions[0]?.priceDisplay || '$9.99'}
+                    {planOptions[0]?.priceDisplay ?? t('purchaseModal.priceUnavailable')}
                   </Text>
                   <Text style={[styles.planPriceCaption, { color: theme.colors.text }]}>Per year</Text>
                 </View>
@@ -219,7 +215,7 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
                 </View>
                 <View style={styles.planPriceGroup}>
                   <Text style={[styles.planPriceCaption, { color: theme.colors.text }]}>
-                    then <Text style={[styles.planPrice, { color: theme.colors.text }]}>{planOptions[1]?.priceDisplay || '$3.99'}</Text>
+                    then <Text style={[styles.planPrice, { color: theme.colors.text }]}>{planOptions[1]?.priceDisplay ?? t('purchaseModal.priceUnavailable')}</Text>
                   </Text>
                   <Text style={[styles.planPriceCaption, { color: theme.colors.text }]}>per week</Text>
                 </View>

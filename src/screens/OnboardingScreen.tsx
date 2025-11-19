@@ -10,6 +10,7 @@ import {
   ViewToken,
   Alert,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -136,10 +137,15 @@ const OnboardingScreen: React.FC<
 > = ({ navigation }) => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
+  const { width: windowWidth } = useWindowDimensions();
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const { products, purchase, restore, isLoading, isPremium } = usePurchase();
   const [selectedProductId, setSelectedProductId] = useState<ProductId | null>(null);
+  const bottomControlsWidth = useMemo(
+    () => Math.max(0, Math.min(windowWidth - 48, 700)),
+    [windowWidth]
+  );
 
   // Get slides based on current language with fallback to English
   const slides = useMemo(() => getSlidesForLanguage(i18n.language), [i18n.language]);
@@ -262,6 +268,7 @@ const OnboardingScreen: React.FC<
   };
 
   const isLastSlide = currentIndex === slides.length - 1;
+  const isIpad = Platform.OS === 'ios' && Platform.isPad;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top', 'bottom']}>
@@ -280,34 +287,36 @@ const OnboardingScreen: React.FC<
 
       {/* Bottom Controls */}
       {!isLastSlide && (
-        <View style={styles.bottomControls}>
-          {/* Pagination Dots */}
-          <View style={styles.pagination}>
-            {slides.slice(0, -1).map((_, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.dot,
-                  { backgroundColor: theme.colors.border },
-                  index === currentIndex && [styles.dotActive, { backgroundColor: theme.colors.buttonPrimary }],
-                ]}
-              />
-            ))}
-          </View>
+        <View style={[styles.bottomControls, isIpad && styles.bottomControlsIpad]}>
+          <View style={[styles.bottomControlsContent, { width: bottomControlsWidth }]}>
+            {/* Pagination Dots */}
+            <View style={styles.pagination}>
+              {slides.slice(0, -1).map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.dot,
+                    { backgroundColor: theme.colors.border },
+                    index === currentIndex && [styles.dotActive, { backgroundColor: "#1C0D0D" }],
+                  ]}
+                />
+              ))}
+            </View>
 
-          {/* Action Buttons */}
-          <View style={styles.buttonRow}>
-            <Pressable onPress={handleSkip} style={styles.textButton}>
-              <Text style={[styles.textButtonLabel, { color: theme.colors.textSecondary }]}>
-                {t('onboarding.skip')}
-              </Text>
-            </Pressable>
+            {/* Action Buttons */}
+            <View style={styles.buttonRow}>
+              <Pressable onPress={handleSkip} style={styles.nextButton}>
+                <Text style={[styles.textButtonLabel]}>
+                  {t('onboarding.skip')}
+                </Text>
+              </Pressable>
 
-            <Pressable onPress={handleNext} style={[styles.nextButton, { backgroundColor: theme.colors.buttonPrimary }]}>
-              <Text style={[styles.nextButtonText, { color: theme.colors.buttonText }]}>
-                {t('onboarding.next')}
-              </Text>
-            </Pressable>
+              <Pressable onPress={handleNext} style={[styles.nextButton, { backgroundColor: "#9977B8" }]}>
+                <Text style={[styles.nextButtonText, { color: theme.colors.buttonText }]}>
+                  {t('onboarding.next')}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       )}
@@ -333,6 +342,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: 24,
+    alignItems: 'center',
+  },
+  bottomControlsIpad: {
+  },
+  bottomControlsContent: {
+    width: '100%',
   },
   pagination: {
     flexDirection: 'row',
@@ -353,6 +368,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    width: '100%',
   },
   textButton: {
     paddingVertical: 12,
@@ -361,9 +377,12 @@ const styles = StyleSheet.create({
   textButtonLabel: {
     fontSize: 16,
     fontWeight: '600',
+    color: "#F2EDED"
   },
   nextButton: {
     borderRadius: 24,
+    overflow: "hidden",
+    backgroundColor: "#9977B8",
     paddingVertical: 14,
     paddingHorizontal: 32,
   },

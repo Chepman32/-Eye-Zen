@@ -127,7 +127,19 @@ export const fetchProducts = async (): Promise<IAPProduct[]> => {
   }
 
   try {
+    console.log('Fetching products with IDs:', IOS_PRODUCT_IDS);
     const products = await getProducts({ skus: IOS_PRODUCT_IDS });
+
+    console.log(`Successfully fetched ${products.length} products from App Store`);
+
+    if (products.length === 0) {
+      console.warn('⚠️ No products returned from App Store. Possible causes:');
+      console.warn('  1. Products not configured in App Store Connect');
+      console.warn('  2. Product IDs do not match exactly');
+      console.warn('  3. Products not approved for testing');
+      console.warn('  4. Not signed in with sandbox test account');
+      console.warn('  Expected product IDs:', IOS_PRODUCT_IDS);
+    }
 
     return products.map((product: any) => ({
       productId: product.productId,
@@ -139,7 +151,10 @@ export const fetchProducts = async (): Promise<IAPProduct[]> => {
     }));
   } catch (error: any) {
     if (!error?.message?.includes('E_IAP_NOT_AVAILABLE')) {
-      console.error('Error fetching products:', error);
+      console.error('❌ Error fetching products:', error);
+      console.error('Error code:', error?.code);
+      console.error('Error message:', error?.message);
+      console.error('Attempted to fetch:', IOS_PRODUCT_IDS);
     }
     return [];
   }

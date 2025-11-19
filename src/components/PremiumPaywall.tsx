@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Switch,
+  useWindowDimensions,
   type ImageSourcePropType,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -100,6 +101,9 @@ interface PremiumPaywallProps {
   isLoading: boolean;
   isPurchaseSupported: boolean;
   ctaDisabled: boolean;
+  isLoadingProducts: boolean;
+  productsError: string | null;
+  onRetryLoadProducts: () => void;
 }
 
 export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
@@ -113,10 +117,43 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
   isLoading,
   isPurchaseSupported,
   ctaDisabled,
+  isLoadingProducts,
+  productsError,
+  onRetryLoadProducts,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { width } = useWindowDimensions();
   const [freeTrialEnabled, setFreeTrialEnabled] = useState(false);
+
+  // Detect iPad layout (width >= 768)
+  const isTabletLayout = width >= 768;
+
+  // Responsive scaling for fonts and spacing
+  const scale = useMemo(() => {
+    if (isTabletLayout) {
+      // Scale up for iPad, but cap at 1.4x for very large iPads
+      return Math.min(1.4, width / 550);
+    }
+    return 1;
+  }, [width, isTabletLayout]);
+
+  // Responsive values
+  const responsiveValues = useMemo(() => ({
+    horizontalPadding: isTabletLayout ? 60 : 20,
+    titleFontSize: Math.round(32 * scale),
+    featureFontSize: Math.round(17 * scale),
+    planTitleFontSize: Math.round(19 * scale),
+    planPriceFontSize: Math.round(22 * scale),
+    planCaptionFontSize: Math.round(14 * scale),
+    badgeFontSize: Math.round(13 * scale),
+    toggleLabelFontSize: Math.round(18 * scale),
+    ctaFontSize: Math.round(20 * scale),
+    planCardPadding: isTabletLayout ? 28 : 18,
+    togglePadding: isTabletLayout ? 28 : 20,
+    iconSize: Math.round(24 * scale),
+    radioSize: Math.round(28 * scale),
+  }), [scale, isTabletLayout]);
 
   const features = [
     {
@@ -132,7 +169,7 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
     <LinearGradient
       colors={[`${theme.colors.background}FA`, `${theme.colors.background}F2`]}
       style={styles.gradient}>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={[styles.safeArea, { paddingHorizontal: responsiveValues.horizontalPadding }]}>
         <View style={styles.header}>
           <Pressable onPress={onClose} hitSlop={10} style={[styles.headerButton, { backgroundColor: `${theme.colors.text}0D` }]}>
             <Text style={[styles.headerButtonText, { color: theme.colors.text }]}>✕</Text>
@@ -145,13 +182,17 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>Take care of your{'\n'}eyes and wellness</Text>
+          <Text style={[styles.title, { color: theme.colors.text, fontSize: responsiveValues.titleFontSize }]} numberOfLines={2}>
+            Take care of your{'\n'}eyes and wellness
+          </Text>
 
           <View style={styles.features}>
             {features.map((feature) => (
               <View key={feature.text} style={styles.featureRow}>
-                <Ionicons name={feature.icon as any} size={24} color={theme.colors.text} />
-                <Text style={[styles.featureText, { color: theme.colors.text }]}>{feature.text}</Text>
+                <Ionicons name={feature.icon as any} size={responsiveValues.iconSize} color={theme.colors.text} />
+                <Text style={[styles.featureText, { color: theme.colors.text, fontSize: responsiveValues.featureFontSize }]} numberOfLines={2}>
+                  {feature.text}
+                </Text>
               </View>
             ))}
           </View>
@@ -166,27 +207,37 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
                   borderColor: selectedProductId === planOptions[0]?.id ? theme.colors.success : theme.colors.border,
                   backgroundColor: selectedProductId === planOptions[0]?.id ? theme.colors.surface : theme.colors.backgroundSecondary,
                   shadowColor: selectedProductId === planOptions[0]?.id ? theme.colors.success : undefined,
+                  padding: responsiveValues.planCardPadding,
                 },
                 selectedProductId === planOptions[0]?.id && styles.planCardSelected,
               ]}>
               <View style={[styles.badge, { backgroundColor: theme.colors.success }]}>
-                <Text style={[styles.badgeText, { color: theme.colors.textInverse }]}>Save 95%</Text>
+                <Text style={[styles.badgeText, { color: theme.colors.textInverse, fontSize: responsiveValues.badgeFontSize }]}>Save 95%</Text>
               </View>
               <View style={styles.planHeader}>
                 <View style={[
                   styles.radioOuter,
-                  { borderColor: selectedProductId === planOptions[0]?.id ? theme.colors.success : theme.colors.border }
+                  {
+                    borderColor: selectedProductId === planOptions[0]?.id ? theme.colors.success : theme.colors.border,
+                    width: responsiveValues.radioSize,
+                    height: responsiveValues.radioSize,
+                    borderRadius: responsiveValues.radioSize / 2,
+                  }
                 ]}>
                   {selectedProductId === planOptions[0]?.id && <View style={[styles.radioInner, { backgroundColor: theme.colors.success }]} />}
                 </View>
                 <View style={styles.planText}>
-                  <Text style={[styles.planTitle, { color: theme.colors.text }]}>Yearly Plan</Text>
+                  <Text style={[styles.planTitle, { color: theme.colors.text, fontSize: responsiveValues.planTitleFontSize }]} numberOfLines={1}>
+                    Yearly Plan
+                  </Text>
                 </View>
                 <View style={styles.planPriceGroup}>
-                  <Text style={[styles.planPrice, { color: theme.colors.text }]}>
+                  <Text style={[styles.planPrice, { color: theme.colors.text, fontSize: responsiveValues.planPriceFontSize }]} numberOfLines={1}>
                     {planOptions[0]?.priceDisplay ?? t('purchaseModal.priceUnavailable')}
                   </Text>
-                  <Text style={[styles.planPriceCaption, { color: theme.colors.text }]}>Per year</Text>
+                  <Text style={[styles.planPriceCaption, { color: theme.colors.text, fontSize: responsiveValues.planCaptionFontSize }]} numberOfLines={1}>
+                    Per year
+                  </Text>
                 </View>
               </View>
             </Pressable>
@@ -200,32 +251,46 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
                   borderColor: selectedProductId === planOptions[1]?.id ? theme.colors.success : theme.colors.border,
                   backgroundColor: selectedProductId === planOptions[1]?.id ? theme.colors.surface : theme.colors.backgroundSecondary,
                   shadowColor: selectedProductId === planOptions[1]?.id ? theme.colors.success : undefined,
+                  padding: responsiveValues.planCardPadding,
                 },
                 selectedProductId === planOptions[1]?.id && styles.planCardSelected,
               ]}>
               <View style={styles.planHeader}>
                 <View style={[
                   styles.radioOuter,
-                  { borderColor: selectedProductId === planOptions[1]?.id ? theme.colors.success : theme.colors.border }
+                  {
+                    borderColor: selectedProductId === planOptions[1]?.id ? theme.colors.success : theme.colors.border,
+                    width: responsiveValues.radioSize,
+                    height: responsiveValues.radioSize,
+                    borderRadius: responsiveValues.radioSize / 2,
+                  }
                 ]}>
                   {selectedProductId === planOptions[1]?.id && <View style={[styles.radioInner, { backgroundColor: theme.colors.success }]} />}
                 </View>
                 <View style={styles.planText}>
-                  <Text style={[styles.planTitle, { color: theme.colors.text }]}>7 days free trial</Text>
+                  <Text style={[styles.planTitle, { color: theme.colors.text, fontSize: responsiveValues.planTitleFontSize }]} numberOfLines={1}>
+                    7 days free trial
+                  </Text>
                 </View>
                 <View style={styles.planPriceGroup}>
-                  <Text style={[styles.planPriceCaption, { color: theme.colors.text }]}>
-                    then <Text style={[styles.planPrice, { color: theme.colors.text }]}>{planOptions[1]?.priceDisplay ?? t('purchaseModal.priceUnavailable')}</Text>
+                  <Text style={[styles.planPriceCaption, { color: theme.colors.text, fontSize: responsiveValues.planCaptionFontSize }]} numberOfLines={2}>
+                    then <Text style={[styles.planPrice, { color: theme.colors.text, fontSize: responsiveValues.planPriceFontSize }]}>
+                      {planOptions[1]?.priceDisplay ?? t('purchaseModal.priceUnavailable')}
+                    </Text>
                   </Text>
-                  <Text style={[styles.planPriceCaption, { color: theme.colors.text }]}>per week</Text>
+                  <Text style={[styles.planPriceCaption, { color: theme.colors.text, fontSize: responsiveValues.planCaptionFontSize }]} numberOfLines={1}>
+                    per week
+                  </Text>
                 </View>
               </View>
             </Pressable>
           </View>
 
           {/* Free Trial Toggle */}
-          <View style={[styles.toggleContainer, { backgroundColor: theme.colors.backgroundSecondary }]}>
-            <Text style={[styles.toggleLabel, { color: theme.colors.text }]}>Enable the free trial</Text>
+          <View style={[styles.toggleContainer, { backgroundColor: theme.colors.backgroundSecondary, padding: responsiveValues.togglePadding }]}>
+            <Text style={[styles.toggleLabel, { color: theme.colors.text, fontSize: responsiveValues.toggleLabelFontSize }]} numberOfLines={1}>
+              Enable the free trial
+            </Text>
             <Switch
               value={freeTrialEnabled}
               onValueChange={setFreeTrialEnabled}
@@ -234,7 +299,28 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
             />
           </View>
 
-          {!isPurchaseSupported && (
+          {/* Loading state for products */}
+          {isLoadingProducts && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator color={theme.colors.text} size="small" />
+              <Text style={[styles.loadingText, { color: theme.colors.textSecondary }]}>Loading pricing...</Text>
+            </View>
+          )}
+
+          {/* Error state with retry button */}
+          {!isLoadingProducts && productsError && (
+            <View style={[styles.errorContainer, { backgroundColor: theme.colors.backgroundSecondary }]}>
+              <Ionicons name="alert-circle-outline" size={24} color={theme.colors.error} />
+              <Text style={[styles.errorText, { color: theme.colors.text }]}>{productsError}</Text>
+              <Pressable
+                onPress={onRetryLoadProducts}
+                style={[styles.retryButton, { backgroundColor: theme.colors.buttonPrimary }]}>
+                <Text style={[styles.retryButtonText, { color: theme.colors.buttonText }]}>Retry</Text>
+              </Pressable>
+            </View>
+          )}
+
+          {!isPurchaseSupported && !productsError && !isLoadingProducts && (
             <Text style={[styles.unavailableText, { color: theme.colors.textSecondary }]}>{t('purchaseModal.unavailableMessage')}</Text>
           )}
 
@@ -253,10 +339,10 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
               <ActivityIndicator color={theme.colors.buttonText} />
             ) : (
               <View style={styles.ctaContent}>
-                <Text style={[styles.ctaText, { color: theme.colors.buttonText }]}>
+                <Text style={[styles.ctaText, { color: theme.colors.buttonText, fontSize: responsiveValues.ctaFontSize }]}>
                   Continue
                 </Text>
-                <Ionicons name="arrow-forward" size={24} color={theme.colors.buttonText} style={styles.ctaArrow} />
+                <Ionicons name="arrow-forward" size={responsiveValues.iconSize} color={theme.colors.buttonText} style={styles.ctaArrow} />
               </View>
             )}
           </Pressable>
@@ -285,7 +371,6 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: 20,
     paddingBottom: 24,
   },
   header: {
@@ -315,7 +400,6 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   title: {
-    fontSize: 32,
     fontWeight: '800',
     textAlign: 'center',
     marginBottom: 24,
@@ -360,7 +444,6 @@ const styles = StyleSheet.create({
   featureText: {
     flex: 1,
     marginLeft: 12,
-    fontSize: 17,
     fontWeight: '500',
   },
   planList: {
@@ -369,7 +452,6 @@ const styles = StyleSheet.create({
   planCard: {
     borderRadius: 20,
     borderWidth: 2,
-    padding: 18,
     marginBottom: 12,
   },
   planCardSelected: {
@@ -391,7 +473,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   badgeText: {
-    fontSize: 13,
     fontWeight: '700',
   },
   planHeader: {
@@ -399,9 +480,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   radioOuter: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
@@ -418,7 +496,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   planTitle: {
-    fontSize: 19,
     fontWeight: '600',
   },
   planSubtitle: {
@@ -429,11 +506,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   planPrice: {
-    fontSize: 22,
     fontWeight: '700',
   },
   planPriceCaption: {
-    fontSize: 14,
     marginTop: 2,
   },
   unavailableText: {
@@ -445,12 +520,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderRadius: 16,
-    padding: 20,
     marginTop: 16,
     marginBottom: 8,
   },
   toggleLabel: {
-    fontSize: 18,
     fontWeight: '600',
   },
   ctaButton: {
@@ -470,7 +543,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   ctaText: {
-    fontSize: 20,
     fontWeight: '700',
   },
   ctaArrow: {
@@ -478,5 +550,38 @@ const styles = StyleSheet.create({
   },
   ctaDisabled: {
     opacity: 0.5,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    gap: 8,
+  },
+  loadingText: {
+    fontSize: 14,
+    marginLeft: 8,
+  },
+  errorContainer: {
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    gap: 8,
+  },
+  errorText: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  retryButton: {
+    marginTop: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  retryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

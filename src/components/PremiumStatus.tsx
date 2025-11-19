@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, type DimensionValue } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet, useWindowDimensions, type DimensionValue } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
@@ -16,6 +16,7 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { width } = useWindowDimensions();
   const {
     isPremium,
     remainingVideos,
@@ -24,9 +25,31 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({
     isUnlimited,
   } = useVideoLimit();
 
+  // Detect iPad layout (width >= 768)
+  const isTabletLayout = width >= 768;
+
+  // Responsive scaling for fonts
+  const scale = useMemo(() => {
+    if (isTabletLayout) {
+      // Scale up for iPad, but cap at 1.4x for very large iPads
+      return Math.min(1.4, width / 550);
+    }
+    return 1;
+  }, [width, isTabletLayout]);
+
+  // Responsive values
+  const responsiveValues = useMemo(() => ({
+    horizontalPadding: isTabletLayout ? 40 : 20,
+    cardPadding: isTabletLayout ? 32 : 24,
+    titleFontSize: Math.round(24 * scale),
+    countLabelFontSize: Math.round(14 * scale),
+    countNumberFontSize: Math.round(42 * scale),
+    countTotalFontSize: Math.round(28 * scale),
+  }), [scale, isTabletLayout]);
+
   const containerStyles = [
     styles.container,
-    variant === 'floating' ? [styles.floating, { top: topOffset }] : styles.inline,
+    variant === 'floating' ? [styles.floating, { top: topOffset, left: responsiveValues.horizontalPadding, right: responsiveValues.horizontalPadding }] : styles.inline,
   ];
 
   const remainingLabel = isUnlimited ? '∞' : remainingVideos;
@@ -40,28 +63,29 @@ export const PremiumStatus: React.FC<PremiumStatusProps> = ({
     <>
       <View style={containerStyles}>
         {/* Status Card */}
-        <View style={[styles.card, { backgroundColor: theme.colors.card }]}>
+        <View style={[styles.card, { backgroundColor: theme.colors.card, padding: responsiveValues.cardPadding }]}>
           <View style={styles.header}>
-            <Text style={[styles.title, { color: theme.colors.text }]}>
+            <Text style={[styles.title, { color: theme.colors.text, fontSize: responsiveValues.titleFontSize }]} numberOfLines={1}>
               {isPremium ? t('premium.premiumActive') : t('premium.freePlan')}
             </Text>
           </View>
 
           {/* Video Count */}
           <View style={styles.countContainer}>
-            <Text style={[styles.countLabel, { color: theme.colors.textSecondary }]}>
+            <Text style={[styles.countLabel, { color: theme.colors.textSecondary, fontSize: responsiveValues.countLabelFontSize }]} numberOfLines={1}>
               {t('premium.videosRemaining')}
             </Text>
             <View style={styles.countRow}>
               <Text
                 style={[
                   styles.countNumber,
-                  { color: theme.colors.success },
+                  { color: theme.colors.success, fontSize: responsiveValues.countNumberFontSize },
                   !canWatchVideo && { color: theme.colors.error },
-                ]}>
+                ]}
+                numberOfLines={1}>
                 {remainingLabel}
               </Text>
-              <Text style={[styles.countTotal, { color: theme.colors.textTertiary }]}>
+              <Text style={[styles.countTotal, { color: theme.colors.textTertiary, fontSize: responsiveValues.countTotalFontSize }]} numberOfLines={1}>
                 {' / '}{totalLabel}
               </Text>
             </View>
@@ -95,8 +119,6 @@ const styles = StyleSheet.create({
   },
   floating: {
     position: 'absolute',
-    left: 20,
-    right: 20,
   },
   inline: {
     position: 'relative',
@@ -107,7 +129,6 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 16,
-    padding: 24,
     minHeight: 170,
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -119,14 +140,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 24,
     fontWeight: '700',
   },
   countContainer: {
     marginBottom: 16,
   },
   countLabel: {
-    fontSize: 14,
     marginBottom: 8,
   },
   countRow: {
@@ -134,11 +153,9 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   countNumber: {
-    fontSize: 42,
     fontWeight: '700',
   },
   countTotal: {
-    fontSize: 28,
     fontWeight: '600',
   },
   progressBarContainer: {

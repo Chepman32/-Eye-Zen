@@ -53,12 +53,15 @@ interface PurchaseContextType {
 
   // Products
   products: IAPProduct[];
+  isLoadingProducts: boolean;
+  productsError: string | null;
 
   // Actions
   purchase: (productId?: ProductId) => Promise<void>;
   restore: () => Promise<void>;
   incrementWatchCount: () => Promise<void>;
   refreshStatus: () => Promise<void>;
+  retryLoadProducts: () => Promise<void>;
 }
 
 const PurchaseContext = createContext<PurchaseContextType | undefined>(
@@ -84,6 +87,8 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [dailyWatchCount, setDailyWatchCountState] = useState(0);
   const [products, setProducts] = useState<IAPProduct[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [productsError, setProductsError] = useState<string | null>(null);
   const [premiumPlan, setPremiumPlanState] = useState<PremiumPlan>('free');
   const { recordPositiveEvent } = useReviewPrompt();
 
@@ -166,25 +171,49 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
     try {
       if (Platform.OS !== 'ios') {
         console.log('IAP only supported on iOS currently');
+        setProductsError('In-app purchases are only available on iOS devices');
         return;
       }
+
+      setIsLoadingProducts(true);
+      setProductsError(null);
 
       const connected = await initIAP();
       if (connected) {
         // Fetch available products
         const availableProducts = await fetchProducts();
-        setProducts(availableProducts);
-        console.log('Products fetched:', availableProducts);
+
+        if (availableProducts.length === 0) {
+          setProductsError('Unable to load pricing. Please check your internet connection and try again.');
+          console.warn('No products fetched - possible network issue or App Store Connect configuration');
+        } else {
+          setProducts(availableProducts);
+          setProductsError(null);
+          console.log('Products fetched successfully:', availableProducts);
+        }
+      } else {
+        setProductsError('Unable to connect to the App Store. Please try again.');
       }
     } catch (error: any) {
       // Gracefully handle when IAP is not available (e.g., simulator, unsupported platform)
       if (error?.message?.includes('E_IAP_NOT_AVAILABLE')) {
         console.warn('IAP not available on this device/platform - this is expected in simulator or development');
+        setProductsError('In-app purchases are not available in the simulator. Please test on a real device.');
       } else {
         console.error('Error initializing IAP:', error);
+        setProductsError('Unable to load pricing. Please check your internet connection and try again.');
       }
+    } finally {
+      setIsLoadingProducts(false);
     }
   }, []);
+
+  /**
+   * Retry loading products
+   */
+  const retryLoadProducts = useCallback(async () => {
+    await initializeIAP();
+  }, [initializeIAP]);
 
   /**
    * Handle successful purchase
@@ -406,10 +435,13 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
     canWatchVideo,
     remainingVideos,
     products,
+    isLoadingProducts,
+    productsError,
     purchase,
     restore,
     incrementWatchCount,
     refreshStatus,
+    retryLoadProducts,
   };
 
   return (

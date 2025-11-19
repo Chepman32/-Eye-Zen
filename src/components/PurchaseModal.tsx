@@ -24,7 +24,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   showRestoreButton = true,
 }) => {
   const { t } = useTranslation();
-  const { purchase, restore, isLoading, products } = usePurchase();
+  const { purchase, restore, isLoading, products, isLoadingProducts, productsError, retryLoadProducts } = usePurchase();
   const [pendingAction, setPendingAction] = useState<'purchase' | 'restore' | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<ProductId | null>(null);
   const planOptions = createPaywallPlanOptions(products, t);
@@ -101,6 +101,9 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
         isLoading={isLoading && pendingAction === 'purchase'}
         isPurchaseSupported={isPurchaseSupported}
         ctaDisabled={purchaseDisabled}
+        isLoadingProducts={isLoadingProducts}
+        productsError={productsError}
+        onRetryLoadProducts={retryLoadProducts}
       />
     </Modal>
   );

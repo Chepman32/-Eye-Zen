@@ -89,7 +89,8 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onClose}>
+      onRequestClose={onClose}
+      supportedOrientations={['portrait']}>
       <PremiumPaywall
         backgroundImage={paywallBackground}
         planOptions={planOptions}

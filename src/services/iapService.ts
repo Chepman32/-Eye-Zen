@@ -38,9 +38,7 @@ export type { PurchaseError, Product, Purchase } from 'react-native-iap';
 
 // Product IDs - MUST match exactly what you create in App Store Connect
 export const PRODUCT_IDS = {
-  PREMIUM_VIDEOS: 'com.eyeszen.antonchepur.app.dailyfive', // iOS product ID (lifetime)
-  YEARLY_UNLIMITED: 'com.eyeszen.antonchepur.app.yearlyunlimited', // subscription
-  WEEKLY_TRIAL: 'com.eyeszen.antonchepur.app.weeklytrial', // weekly subscription with trial
+  PREMIUM_VIDEOS: 'com.eyeszen.antonchepur.app.dailyfive', // iOS non-consumable lifetime product
 } as const;
 
 export type ProductId = (typeof PRODUCT_IDS)[keyof typeof PRODUCT_IDS];
@@ -48,8 +46,6 @@ export type ProductId = (typeof PRODUCT_IDS)[keyof typeof PRODUCT_IDS];
 // Map product IDs to internal plan types
 const PRODUCT_PLAN_MAP: Record<ProductId, PremiumPlan> = {
   [PRODUCT_IDS.PREMIUM_VIDEOS]: 'lifetime',
-  [PRODUCT_IDS.YEARLY_UNLIMITED]: 'yearly',
-  [PRODUCT_IDS.WEEKLY_TRIAL]: 'yearly', // Maps to yearly plan for now
 };
 
 // iOS product IDs array
@@ -58,7 +54,6 @@ const IOS_PRODUCT_IDS: ProductId[] = Object.values(PRODUCT_IDS);
 const PLAN_PRIORITY: Record<PremiumPlan, number> = {
   free: 0,
   lifetime: 1,
-  yearly: 2,
 };
 
 const getPlanForProduct = (productId: string): PremiumPlan | null => {
@@ -128,7 +123,30 @@ export const fetchProducts = async (): Promise<IAPProduct[]> => {
 
   try {
     console.log('Fetching products with IDs:', IOS_PRODUCT_IDS);
-    const products = await getProducts({ skus: IOS_PRODUCT_IDS });
+    let products: any[] = [];
+
+    // Try multiple argument shapes supported by react-native-iap
+    const attempts: Array<() => Promise<any[]>> = [
+      () => getProducts({ productIds: IOS_PRODUCT_IDS }),
+      () => getProducts({ skus: IOS_PRODUCT_IDS }),
+      () => getProducts(IOS_PRODUCT_IDS as any),
+    ];
+
+    let lastError: unknown;
+    for (const attempt of attempts) {
+      try {
+        products = await attempt();
+        lastError = undefined;
+        break;
+      } catch (err) {
+        lastError = err;
+        console.warn('Product fetch attempt failed', err);
+      }
+    }
+
+    if (lastError && products.length === 0) {
+      throw lastError;
+    }
 
     console.log(`Successfully fetched ${products.length} products from App Store`);
 

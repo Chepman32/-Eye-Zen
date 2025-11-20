@@ -83,7 +83,7 @@ export const setIsPremium = async (isPremium: boolean): Promise<void> => {
 export const getPremiumPlan = async (): Promise<PremiumPlan> => {
   try {
     const value = await AsyncStorage.getItem(STORAGE_KEYS.PREMIUM_PLAN);
-    if (value === 'lifetime' || value === 'yearly') {
+    if (value === 'lifetime') {
       return value;
     }
     return 'free';

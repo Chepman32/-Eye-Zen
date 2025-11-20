@@ -140,7 +140,16 @@ const OnboardingScreen: React.FC<
   const { width: windowWidth } = useWindowDimensions();
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { products, purchase, restore, isLoading, isPremium } = usePurchase();
+  const {
+    products,
+    purchase,
+    restore,
+    isLoading,
+    isPremium,
+    isLoadingProducts,
+    productsError,
+    retryLoadProducts,
+  } = usePurchase();
   const [selectedProductId, setSelectedProductId] = useState<ProductId | null>(null);
   const bottomControlsWidth = useMemo(
     () => Math.max(0, Math.min(windowWidth - 48, 700)),
@@ -255,6 +264,9 @@ const OnboardingScreen: React.FC<
             isLoading={isLoading}
             isPurchaseSupported={isPurchaseSupported}
             ctaDisabled={purchaseDisabled}
+            isLoadingProducts={isLoadingProducts}
+            productsError={productsError}
+            onRetryLoadProducts={retryLoadProducts}
           />
         </View>
       );

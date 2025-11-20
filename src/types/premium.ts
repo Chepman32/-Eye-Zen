@@ -1,9 +1,9 @@
-export type PremiumPlan = 'free' | 'lifetime' | 'yearly';
+export type PremiumPlan = 'free' | 'lifetime';
 
 export const PREMIUM_PLAN_LIMITS: Record<PremiumPlan, number> = {
   free: 1,
-  lifetime: 5,
-  yearly: Infinity,
+  // Paying users get unlimited sessions
+  lifetime: Infinity,
 };
 
-export const isUnlimitedPlan = (plan: PremiumPlan): boolean => plan === 'yearly';
+export const isUnlimitedPlan = (plan: PremiumPlan): boolean => plan === 'lifetime';

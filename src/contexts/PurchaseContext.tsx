@@ -184,7 +184,9 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
         const availableProducts = await fetchProducts();
 
         if (availableProducts.length === 0) {
-          setProductsError('Unable to load pricing. Please check your internet connection and try again.');
+          setProductsError(
+            'Pricing unavailable. Confirm the in-app purchase is “Ready to Submit/Approved” in App Store Connect, product IDs match, and you are signed into the device with a Sandbox tester.'
+          );
           console.warn('No products fetched - possible network issue or App Store Connect configuration');
         } else {
           setProducts(availableProducts);
@@ -201,7 +203,9 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
         setProductsError('In-app purchases are not available in the simulator. Please test on a real device.');
       } else {
         console.error('Error initializing IAP:', error);
-        setProductsError('Unable to load pricing. Please check your internet connection and try again.');
+        setProductsError(
+          'Unable to load pricing. Please ensure you are online, signed in with a Sandbox tester, and the product is approved in App Store Connect.'
+        );
       }
     } finally {
       setIsLoadingProducts(false);

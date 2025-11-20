@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   ImageBackground,
   SafeAreaView,
   ActivityIndicator,
-  Switch,
   useWindowDimensions,
   type ImageSourcePropType,
 } from 'react-native';
@@ -45,27 +44,12 @@ export const createPaywallPlanOptions = (
     alwaysShow: boolean;
   }> = [
     {
-      id: PRODUCT_IDS.YEARLY_UNLIMITED,
-      title: t('purchaseModal.yearlyPlanTitle'),
-      subtitle: t('purchaseModal.yearlyPlanSubtitle'),
-      badge: t('purchaseModal.bestValueBadge'),
-      priceCaption: t('purchaseModal.perYear'),
-      highlight: true,
-      alwaysShow: true,
-    },
-    {
-      id: PRODUCT_IDS.WEEKLY_TRIAL,
-      title: '7 days free trial',
-      subtitle: 'then $3.99 per week',
-      priceCaption: 'per week',
-      alwaysShow: true,
-    },
-    {
       id: PRODUCT_IDS.PREMIUM_VIDEOS,
       title: t('purchaseModal.lifetimePlanTitle'),
       subtitle: t('purchaseModal.lifetimePlanSubtitle'),
       priceCaption: t('purchaseModal.oneTimePayment'),
-      alwaysShow: false,
+      alwaysShow: true,
+      highlight: true,
     },
   ];
 
@@ -124,7 +108,6 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { width } = useWindowDimensions();
-  const [freeTrialEnabled, setFreeTrialEnabled] = useState(false);
 
   // Detect iPad layout (width >= 768)
   const isTabletLayout = width >= 768;
@@ -147,10 +130,8 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
     planPriceFontSize: Math.round(22 * scale),
     planCaptionFontSize: Math.round(14 * scale),
     badgeFontSize: Math.round(13 * scale),
-    toggleLabelFontSize: Math.round(18 * scale),
     ctaFontSize: Math.round(20 * scale),
     planCardPadding: isTabletLayout ? 28 : 18,
-    togglePadding: isTabletLayout ? 28 : 20,
     iconSize: Math.round(24 * scale),
     radioSize: Math.round(28 * scale),
   }), [scale, isTabletLayout]);
@@ -198,105 +179,63 @@ export const PremiumPaywall: React.FC<PremiumPaywallProps> = ({
           </View>
 
           <View style={styles.planList}>
-            {/* Yearly Plan */}
-            <Pressable
-              onPress={() => planOptions[0] && onSelectPlan(planOptions[0].id)}
-              style={[
-                styles.planCard,
-                {
-                  borderColor: selectedProductId === planOptions[0]?.id ? theme.colors.success : theme.colors.border,
-                  backgroundColor: selectedProductId === planOptions[0]?.id ? theme.colors.surface : theme.colors.backgroundSecondary,
-                  shadowColor: selectedProductId === planOptions[0]?.id ? theme.colors.success : undefined,
-                  padding: responsiveValues.planCardPadding,
-                },
-                selectedProductId === planOptions[0]?.id && styles.planCardSelected,
-              ]}>
-              <View style={[styles.badge, { backgroundColor: theme.colors.success }]}>
-                <Text style={[styles.badgeText, { color: theme.colors.textInverse, fontSize: responsiveValues.badgeFontSize }]}>Save 95%</Text>
-              </View>
-              <View style={styles.planHeader}>
-                <View style={[
-                  styles.radioOuter,
-                  {
-                    borderColor: selectedProductId === planOptions[0]?.id ? theme.colors.success : theme.colors.border,
-                    width: responsiveValues.radioSize,
-                    height: responsiveValues.radioSize,
-                    borderRadius: responsiveValues.radioSize / 2,
-                  }
-                ]}>
-                  {selectedProductId === planOptions[0]?.id && <View style={[styles.radioInner, { backgroundColor: theme.colors.success }]} />}
-                </View>
-                <View style={styles.planText}>
-                  <Text style={[styles.planTitle, { color: theme.colors.text, fontSize: responsiveValues.planTitleFontSize }]} numberOfLines={1}>
-                    Yearly Plan
-                  </Text>
-                </View>
-                <View style={styles.planPriceGroup}>
-                  <Text style={[styles.planPrice, { color: theme.colors.text, fontSize: responsiveValues.planPriceFontSize }]} numberOfLines={1}>
-                    {planOptions[0]?.priceDisplay ?? t('purchaseModal.priceUnavailable')}
-                  </Text>
-                  <Text style={[styles.planPriceCaption, { color: theme.colors.text, fontSize: responsiveValues.planCaptionFontSize }]} numberOfLines={1}>
-                    Per year
-                  </Text>
-                </View>
-              </View>
-            </Pressable>
+            {planOptions.map((plan) => {
+              const isSelected = selectedProductId === plan.id;
+              const priceLabel = plan.priceDisplay ?? t('purchaseModal.priceUnavailable');
 
-            {/* Weekly Plan with 7 days free trial */}
-            <Pressable
-              onPress={() => planOptions[1] && onSelectPlan(planOptions[1].id)}
-              style={[
-                styles.planCard,
-                {
-                  borderColor: selectedProductId === planOptions[1]?.id ? theme.colors.success : theme.colors.border,
-                  backgroundColor: selectedProductId === planOptions[1]?.id ? theme.colors.surface : theme.colors.backgroundSecondary,
-                  shadowColor: selectedProductId === planOptions[1]?.id ? theme.colors.success : undefined,
-                  padding: responsiveValues.planCardPadding,
-                },
-                selectedProductId === planOptions[1]?.id && styles.planCardSelected,
-              ]}>
-              <View style={styles.planHeader}>
-                <View style={[
-                  styles.radioOuter,
-                  {
-                    borderColor: selectedProductId === planOptions[1]?.id ? theme.colors.success : theme.colors.border,
-                    width: responsiveValues.radioSize,
-                    height: responsiveValues.radioSize,
-                    borderRadius: responsiveValues.radioSize / 2,
-                  }
-                ]}>
-                  {selectedProductId === planOptions[1]?.id && <View style={[styles.radioInner, { backgroundColor: theme.colors.success }]} />}
-                </View>
-                <View style={styles.planText}>
-                  <Text style={[styles.planTitle, { color: theme.colors.text, fontSize: responsiveValues.planTitleFontSize }]} numberOfLines={1}>
-                    7 days free trial
-                  </Text>
-                </View>
-                <View style={styles.planPriceGroup}>
-                  <Text style={[styles.planPriceCaption, { color: theme.colors.text, fontSize: responsiveValues.planCaptionFontSize }]} numberOfLines={2}>
-                    then <Text style={[styles.planPrice, { color: theme.colors.text, fontSize: responsiveValues.planPriceFontSize }]}>
-                      {planOptions[1]?.priceDisplay ?? t('purchaseModal.priceUnavailable')}
-                    </Text>
-                  </Text>
-                  <Text style={[styles.planPriceCaption, { color: theme.colors.text, fontSize: responsiveValues.planCaptionFontSize }]} numberOfLines={1}>
-                    per week
-                  </Text>
-                </View>
-              </View>
-            </Pressable>
-          </View>
-
-          {/* Free Trial Toggle */}
-          <View style={[styles.toggleContainer, { backgroundColor: theme.colors.backgroundSecondary, padding: responsiveValues.togglePadding }]}>
-            <Text style={[styles.toggleLabel, { color: theme.colors.text, fontSize: responsiveValues.toggleLabelFontSize }]} numberOfLines={1}>
-              Enable the free trial
-            </Text>
-            <Switch
-              value={freeTrialEnabled}
-              onValueChange={setFreeTrialEnabled}
-              trackColor={{ false: theme.colors.border, true: theme.colors.success }}
-              thumbColor={theme.colors.surface}
-            />
+              return (
+                <Pressable
+                  key={plan.id}
+                  onPress={() => onSelectPlan(plan.id)}
+                  style={[
+                    styles.planCard,
+                    {
+                      borderColor: isSelected ? theme.colors.success : theme.colors.border,
+                      backgroundColor: isSelected ? theme.colors.surface : theme.colors.backgroundSecondary,
+                      shadowColor: isSelected ? theme.colors.success : undefined,
+                      padding: responsiveValues.planCardPadding,
+                    },
+                    isSelected && styles.planCardSelected,
+                  ]}>
+                  {plan.badge && (
+                    <View style={[styles.badge, { backgroundColor: theme.colors.success }]}>
+                      <Text style={[styles.badgeText, { color: theme.colors.textInverse, fontSize: responsiveValues.badgeFontSize }]}>
+                        {plan.badge}
+                      </Text>
+                    </View>
+                  )}
+                  <View style={styles.planHeader}>
+                    <View style={[
+                      styles.radioOuter,
+                      {
+                        borderColor: isSelected ? theme.colors.success : theme.colors.border,
+                        width: responsiveValues.radioSize,
+                        height: responsiveValues.radioSize,
+                        borderRadius: responsiveValues.radioSize / 2,
+                      }
+                    ]}>
+                      {isSelected && <View style={[styles.radioInner, { backgroundColor: theme.colors.success }]} />}
+                    </View>
+                    <View style={styles.planText}>
+                      <Text style={[styles.planTitle, { color: theme.colors.text, fontSize: responsiveValues.planTitleFontSize }]} numberOfLines={1}>
+                        {plan.title}
+                      </Text>
+                      <Text style={[styles.planSubtitle, { color: theme.colors.textSecondary, fontSize: responsiveValues.planCaptionFontSize }]} numberOfLines={2}>
+                        {plan.subtitle}
+                      </Text>
+                    </View>
+                    <View style={styles.planPriceGroup}>
+                      <Text style={[styles.planPrice, { color: theme.colors.text, fontSize: responsiveValues.planPriceFontSize }]} numberOfLines={1}>
+                        {priceLabel}
+                      </Text>
+                      <Text style={[styles.planPriceCaption, { color: theme.colors.textSecondary, fontSize: responsiveValues.planCaptionFontSize }]} numberOfLines={1}>
+                        {plan.priceCaption}
+                      </Text>
+                    </View>
+                  </View>
+                </Pressable>
+              );
+            })}
           </View>
 
           {/* Loading state for products */}
@@ -514,17 +453,6 @@ const styles = StyleSheet.create({
   unavailableText: {
     textAlign: 'center',
     marginTop: 12,
-  },
-  toggleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderRadius: 16,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  toggleLabel: {
-    fontWeight: '600',
   },
   ctaButton: {
     marginTop: 24,

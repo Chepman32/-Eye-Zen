@@ -113,6 +113,23 @@ export const disconnectIAP = async (): Promise<void> => {
 };
 
 /**
+ * Wraps a promise with a timeout
+ * If the promise doesn't resolve within the timeout, it rejects
+ */
+const withTimeout = <T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  timeoutError: string = 'Operation timed out'
+): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(timeoutError)), timeoutMs)
+    ),
+  ]);
+};
+
+/**
  * Get available products from App Store
  */
 export const fetchProducts = async (): Promise<IAPProduct[]> => {
@@ -122,41 +139,49 @@ export const fetchProducts = async (): Promise<IAPProduct[]> => {
   }
 
   try {
-    console.log('Fetching products with IDs:', IOS_PRODUCT_IDS);
-    let products: any[] = [];
+    console.log('🛒 Fetching products with IDs:', IOS_PRODUCT_IDS);
+    console.log('📱 Platform:', Platform.OS);
+    console.log('🔧 IAP Module Available:', isIAPAvailable);
+    console.log('📊 Product IDs array length:', IOS_PRODUCT_IDS.length);
+    console.log('📊 Product IDs array:', JSON.stringify(IOS_PRODUCT_IDS));
+    console.log('📊 getProducts function available:', typeof getProducts);
+    console.log('🕐 Starting product fetch at:', new Date().toISOString());
 
-    // Try multiple argument shapes supported by react-native-iap
-    const attempts: Array<() => Promise<any[]>> = [
-      () => getProducts({ productIds: IOS_PRODUCT_IDS }),
-      () => getProducts({ skus: IOS_PRODUCT_IDS }),
-      () => getProducts(IOS_PRODUCT_IDS as any),
-    ];
-
-    let lastError: unknown;
-    for (const attempt of attempts) {
-      try {
-        products = await attempt();
-        lastError = undefined;
-        break;
-      } catch (err) {
-        lastError = err;
-        console.warn('Product fetch attempt failed', err);
-      }
+    // Validate product IDs array
+    if (!IOS_PRODUCT_IDS || IOS_PRODUCT_IDS.length === 0) {
+      throw new Error('Product IDs array is empty or undefined');
     }
 
-    if (lastError && products.length === 0) {
-      throw lastError;
-    }
+    const startTime = Date.now();
 
-    console.log(`Successfully fetched ${products.length} products from App Store`);
+    // In react-native-iap v13.x, getProducts requires { skus: string[] }
+    // Wrap with 10-second timeout to prevent infinite hanging
+    const products: any[] = await withTimeout(
+      getProducts({ skus: IOS_PRODUCT_IDS }),
+      10000,
+      'Product fetch timed out after 10 seconds. Please check your internet connection and try again.'
+    );
+
+    const elapsedTime = Date.now() - startTime;
+    console.log(`✅ Successfully fetched ${products.length} products from App Store in ${elapsedTime}ms`);
 
     if (products.length === 0) {
-      console.warn('⚠️ No products returned from App Store. Possible causes:');
-      console.warn('  1. Products not configured in App Store Connect');
-      console.warn('  2. Product IDs do not match exactly');
-      console.warn('  3. Products not approved for testing');
-      console.warn('  4. Not signed in with sandbox test account');
-      console.warn('  Expected product IDs:', IOS_PRODUCT_IDS);
+      console.warn('\n⚠️  NO PRODUCTS RETURNED FROM APP STORE');
+      console.warn('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.warn('Possible causes:');
+      console.warn('  1. ❌ Product status is "Waiting for Review" or "Pending" in App Store Connect');
+      console.warn('     → Products must be "Ready to Submit" or "Approved" for sandbox testing');
+      console.warn('     → Check: https://appstoreconnect.apple.com → In-App Purchases');
+      console.warn('  2. ❌ Product IDs do not match exactly');
+      console.warn('     → Expected:', IOS_PRODUCT_IDS);
+      console.warn('  3. ❌ Not signed in with Sandbox tester account');
+      console.warn('     → Check: Settings → App Store → Sandbox Account on device');
+      console.warn('  4. ❌ Products not configured in App Store Connect');
+      console.warn('  5. ⏳ Product recently created (allow 2-4 hours for propagation)');
+      console.warn('\n💡 Testing alternatives:');
+      console.warn('  • Use iOS Simulator with StoreKit Configuration file');
+      console.warn('  • Ensure Xcode scheme has StoreKit Configuration enabled');
+      console.warn('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
     }
 
     return products.map((product: any) => ({
@@ -168,11 +193,35 @@ export const fetchProducts = async (): Promise<IAPProduct[]> => {
       localizedPrice: product.localizedPrice,
     }));
   } catch (error: any) {
+    // Handle timeout errors specifically
+    if (error?.message?.includes('timed out')) {
+      console.error('\n⏱️  PRODUCT FETCH TIMEOUT');
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.error('The request to fetch products from the App Store took too long (>10s).');
+      console.error('Possible causes:');
+      console.error('  1. ❌ Slow or unstable internet connection');
+      console.error('  2. ❌ App Store servers are slow to respond');
+      console.error('  3. ❌ Product IDs may be invalid, causing StoreKit to hang');
+      console.error('  4. ❌ StoreKit connection issue on device');
+      console.error('  5. ❌ Sandbox account may not be properly configured');
+      console.error('\n💡 Recommended actions:');
+      console.error('  • Check your internet connection');
+      console.error('  • Verify sandbox account in Settings → App Store');
+      console.error('  • Try again in a few moments');
+      console.error('  • Test on iOS Simulator with StoreKit Configuration');
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+      return [];
+    }
+
     if (!error?.message?.includes('E_IAP_NOT_AVAILABLE')) {
-      console.error('❌ Error fetching products:', error);
-      console.error('Error code:', error?.code);
-      console.error('Error message:', error?.message);
-      console.error('Attempted to fetch:', IOS_PRODUCT_IDS);
+      console.error('\n❌ ERROR FETCHING PRODUCTS FROM APP STORE');
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.error('Error Details:');
+      console.error('  Code:', error?.code || 'N/A');
+      console.error('  Message:', error?.message || 'Unknown error');
+      console.error('  Product IDs attempted:', IOS_PRODUCT_IDS);
+      console.error('\nFull error object:', JSON.stringify(error, null, 2));
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
     }
     return [];
   }

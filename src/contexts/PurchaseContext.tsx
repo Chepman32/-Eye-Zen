@@ -185,9 +185,15 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
 
         if (availableProducts.length === 0) {
           setProductsError(
-            'Pricing unavailable. Confirm the in-app purchase is “Ready to Submit/Approved” in App Store Connect, product IDs match, and you are signed into the device with a Sandbox tester.'
+            'Pricing unavailable. Check Xcode console for detailed diagnostics.\n\n' +
+            'Most common causes:\n' +
+            '• Product status is "Waiting for Review" in App Store Connect\n' +
+            '  (Products must be "Ready to Submit" or "Approved")\n' +
+            '• Request timed out (slow/unstable connection)\n' +
+            '• Not signed into Sandbox account (Settings → App Store)\n\n' +
+            'Alternative: Test on iOS Simulator with StoreKit Configuration.'
           );
-          console.warn('No products fetched - possible network issue or App Store Connect configuration');
+          console.warn('No products fetched - check console for detailed diagnostics from iapService');
         } else {
           setProducts(availableProducts);
           setProductsError(null);
@@ -204,7 +210,12 @@ export const PurchaseProvider: React.FC<PurchaseProviderProps> = ({
       } else {
         console.error('Error initializing IAP:', error);
         setProductsError(
-          'Unable to load pricing. Please ensure you are online, signed in with a Sandbox tester, and the product is approved in App Store Connect.'
+          'Unable to load pricing. Check Xcode console for detailed error information.\n\n' +
+          'Common fixes:\n' +
+          '• Ensure product is "Approved" (not "Waiting for Review")\n' +
+          '• Use iOS Simulator with StoreKit Configuration\n' +
+          '• Verify Sandbox tester in Settings → App Store\n' +
+          '• Check internet connection'
         );
       }
     } finally {
